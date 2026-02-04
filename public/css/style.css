@@ -7,3 +7,43 @@ body{
 }
 
 /* Navbar */
+.custom-navbar{
+    height: 12vh;
+    background-color: #e7f0fa93;
+
+}
+.navbar-brand{
+    color: #2e5e99 !important;
+    font-size: 25px !important;
+    opacity: 0.8;
+    transition: 0.4s ease  !important;
+}
+.navbar-brand:hover{
+    transform:  scale(1.05);
+    opacity: 1;
+}
+
+#navbarNav{
+    position: absolute;
+    left: 38%;
+
+}
+.nav-link{
+    font-size: 20px !important;
+    color: #121212 !important  ;
+}
+.nav-link:hover{
+    text-decoration: underline;
+    transition: 0.3s ease;
+}
+
+.nav-btns{
+    position: absolute;
+    right: 2%;
+}
+.nav-btn{
+    margin-right: 10px;
+}
+.nav-btn:hover{
+    transform: scale(1.02);
+}
