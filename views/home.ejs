@@ -1,29 +1,130 @@
 <% layout("/layouts/boilerplate.ejs") %>
-<section class="hero text-center text-light d-flex align-items-center">
+
+<!-- Hero Section -->
+
+<section class="hero bg-primary text-white py-5" style="background-color: #e7f0fa;">
   <div class="container">
-    <h1 class="display-4 fw-bold">Compete. Win. Dominate.</h1>
-    <p class="lead">Join player-hosted tournaments and compete for real prize pools.</p>
-    <a href="/tournaments" class="btn btn-lg btn-primary px-4 me-2">Browse Tournaments</a>
-    <a href="/register" class="btn btn-lg btn-outline-light px-4">Become a Host</a>
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <h1 class="display-4 fw-bold" style="color: #2e5e99;">Host & Join Esports Tournaments Effortlessly</h1>
+        <p class="lead" style="color: #0d2440;">A platform where organizers create thrilling esports leagues and players compete in high-stakes gaming battles. Join the ultimate esports community today!</p>
+        <a href="#features" class="btn btn-lg me-3" style="background-color: #7ba4d0; color: white; border: none;" id="cta-btn">Explore Features</a>
+        <a href="/signup" class="btn btn-outline-light btn-lg">Get Started</a>
+      </div>
+      <div class="col-lg-6 text-center">
+        <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Esports players competing in a tournament" class="img-fluid rounded shadow" style="max-height: 400px;">
+      </div>
+    </div>
   </div>
 </section>
 
-<section class="py-5">
-  <div class="container text-center">
-    <h2 class="mb-4">How Battle Arena Works</h2>
+<!-- Features Section -->
+<section id="features" class="py-5 bg-light" style="background-color: #e7f0fa;">
+  <div class="container">
+    <h2 class="text-center mb-5 fw-bold" style="color: #2e5e99;">Why Choose Our Esports Platform?</h2>
     <div class="row g-4">
       <div class="col-md-4">
-        <h5>1. Join as Player</h5>
-        <p>Sign up and explore tournaments created by organizers.</p>
+        <div class="card h-100 border-0 shadow-sm" style="background-color: white;">
+          <div class="card-body text-center">
+            <i class="bi bi-trophy-fill fs-1 mb-3" style="color: #7ba4d0;"></i>
+            <h5 class="card-title" style="color: #2e5e99;">For Organizers</h5>
+            <p class="card-text" style="color: #0d2440;">Easily create and manage esports tournaments with customizable game modes, live streaming integration, and automated matchmaking for popular titles like CS:GO, League of Legends, and more.</p>
+          </div>
+        </div>
       </div>
       <div class="col-md-4">
-        <h5>2. Host a Tournament</h5>
-        <p>Create your own competition with rules, prize pool, and schedule.</p>
+        <div class="card h-100 border-0 shadow-sm" style="background-color: white;">
+          <div class="card-body text-center">
+            <i class="bi bi-people-fill fs-1 mb-3" style="color: #7ba4d0;"></i>
+            <h5 class="card-title" style="color: #2e5e99;">For Players</h5>
+            <p class="card-text" style="color: #0d2440;">Join competitive esports leagues, track your rankings, and connect with a global network of gamers, teams, and fans.</p>
+          </div>
+        </div>
       </div>
       <div class="col-md-4">
-        <h5>3. Compete & Win</h5>
-        <p>Play, win, and follow instructions from the tournament organizer.</p>
+        <div class="card h-100 border-0 shadow-sm" style="background-color: white;">
+          <div class="card-body text-center">
+            <i class="bi bi-shield-check fs-1 mb-3" style="color: #7ba4d0;"></i>
+            <h5 class="card-title" style="color: #2e5e99;">Secure & Fair Play</h5>
+            <p class="card-text" style="color: #0d2440;">Equipped with anti-cheat systems, secure prize pools, and transparent leaderboards to ensure fair esports competitions.</p>
+          </div>
+        </div>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="py-5" style="background-color: #7ba4d0;">
+  <div class="container">
+    <h2 class="text-center mb-5 fw-bold text-white">How Esports Tournaments Work</h2>
+    <div class="row g-4 text-center">
+      <div class="col-md-4">
+        <div class="step-circle mx-auto mb-3" style="width: 80px; height: 80px; background-color: #2e5e99; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+          <span class="text-white fw-bold fs-4">1</span>
+        </div>
+        <h5 class="text-white">Sign Up</h5>
+        <p class="text-white-50">Create an account as an esports organizer or player in minutes.</p>
+      </div>
+      <div class="col-md-4">
+        <div class="step-circle mx-auto mb-3" style="width: 80px; height: 80px; background-color: #2e5e99; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+          <span class="text-white fw-bold fs-4">2</span>
+        </div>
+        <h5 class="text-white">Host or Join</h5>
+        <p class="text-white-50">Organizers launch esports leagues; players browse and register for games.</p>
+      </div>
+      <div class="col-md-4">
+        <div class="step-circle mx-auto mb-3" style="width: 80px; height: 80px; background-color: #2e5e99; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+          <span class="text-white fw-bold fs-4">3</span>
+        </div>
+        <h5 class="text-white">Compete & Win</h5>
+        <p class="text-white-50">Engage in intense matches, earn rewards, and rise through esports leaderboards.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats/Testimonials Section -->
+<section class="py-5 bg-light" style="background-color: #e7f0fa;">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-6">
+        <h3 class="mb-4 fw-bold" style="color: #2e5e99;">Esports Platform Stats</h3>
+        <div class="row text-center">
+          <div class="col-4">
+            <h4 class="fw-bold" style="color: #7ba4d0;">500+</h4>
+            <p style="color: #0d2440;">Esports Tournaments Hosted</p>
+          </div>
+          <div class="col-4">
+            <h4 class="fw-bold" style="color: #7ba4d0;">10K+</h4>
+            <p style="color: #0d2440;">Active Gamers</p>
+          </div>
+          <div class="col-4">
+            <h4 class="fw-bold" style="color: #7ba4d0;">99%</h4>
+            <p style="color: #0d2440;">Uptime</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <h3 class="mb-4 fw-bold" style="color: #2e5e99;">What Esports Users Say</h3>
+        <blockquote class="blockquote">
+          <p class="mb-0" style="color: #0d2440;">"This platform made hosting my League of Legends tournament a breeze. Players loved the seamless experience!"</p>
+          <footer class="blockquote-footer" style="color: #7ba4d0;">Alex, Esports Organizer</footer>
+        </blockquote>
+        <blockquote class="blockquote mt-3">
+          <p class="mb-0" style="color: #0d2440;">"As a gamer, I enjoy the fair competitions and easy registration for CS:GO leagues. Highly recommend!"</p>
+          <footer class="blockquote-footer" style="color: #7ba4d0;">Jordan, Competitive Esports Player</footer>
+        </blockquote>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Call to Action Footer Section -->
+<section class="py-5 text-center" style="background-color: #2e5e99;">
+  <div class="container">
+    <h2 class="text-white mb-3">Ready to Start Your Esports Journey?</h2>
+    <p class="text-white-50 mb-4">Sign up now and join thousands of esports organizers and players.</p>
+    <a href="/register" class="btn btn-lg" style="background-color: #7ba4d0; color: white; border: none;">Sign Up Today</a>
   </div>
 </section>

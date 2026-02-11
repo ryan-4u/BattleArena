@@ -98,3 +98,44 @@ body{
     align-items: center;
     flex-wrap: wrap;
 }
+
+/* home page */
+/* Home Page Specific Styles */
+.hero {
+  background-size: cover;
+  background-position: center;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  transition: 0.3s ease;
+}
+
+.step-circle {
+  transition: 0.3s ease;
+}
+
+.step-circle:hover {
+  transform: scale(1.1);
+}
+
+#cta-btn:hover {
+  background-color: #2e5e99 !important;
+  transform: scale(1.05);
+}
+
+blockquote {
+  border-left: 5px solid #7ba4d0;
+  padding-left: 1rem;
+}
+
+/* Ensure responsiveness */
+@media (max-width: 768px) {
+  .hero .display-4 {
+    font-size: 2rem;
+  }
+  .step-circle {
+    width: 60px;
+    height: 60px;
+  }
+}
