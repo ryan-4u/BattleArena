@@ -139,3 +139,43 @@ blockquote {
     height: 60px;
   }
 }
+
+/* contact page */
+/* Contact Page Specific Styles */
+.contact-info i {
+  font-size: 1.2rem;
+}
+
+.contact-info a:hover {
+  text-decoration: underline;
+}
+
+.social-links a:hover {
+  transform: scale(1.1);
+  transition: 0.3s ease;
+}
+
+#contactForm .form-control:focus {
+  border-color: #7ba4d0;
+  box-shadow: 0 0 0 0.2rem rgba(123, 164, 208, 0.25);
+}
+
+#contactForm button:hover {
+  background-color: #2e5e99 !important;
+  transform: scale(1.05);
+  transition: 0.3s ease;
+}
+
+#contactForm button {
+  transition: 0.3s ease;
+}
+
+/* Ensure responsiveness */
+@media (max-width: 768px) {
+  .hero .display-4 {
+    font-size: 2rem;
+  }
+  .contact-info {
+    text-align: center;
+  }
+}
