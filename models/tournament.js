@@ -1,29 +1,26 @@
-const mongoose = require("mongoose") ;
-const Schema = mongoose.Schema ; 
-const tournamentSchema = new Schema({
-    title:{
-        type: String ,
-        required: true
-    } ,
-    description:{
-        type: String 
-    } ,
-    game : {
-        type: String
-    } ,
-    mode:{
-        type: String 
-    } ,
-    slots:{
-        type : Number 
-    },
-    pool :{
-        type: Number 
-    },
-    timing :{
-        type: String
-    }
-}) 
+const mongoose = require("mongoose");
 
-const Tournaments = mongoose.model("Tournaments",tournamentSchema);
-module.exports = Tournaments ;
+const tournamentSchema = new mongoose.Schema({
+    title: { type: String, required: true },
+    description: String,
+    game: String,
+    mode: String,
+    slots: Number,
+    pool: String,
+    timing: Date,
+    organiser: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    },
+    // NEW FIELDS FOR JOIN SYSTEM
+    joinRequests: [{
+        player: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        status: { type: String, default: "pending" } // pending, accepted, rejected
+    }],
+    participants: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    }]
+}, { timestamps: true });
+
+module.exports = mongoose.model("Tournament", tournamentSchema);

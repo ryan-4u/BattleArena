@@ -26,29 +26,10 @@ app.use(methodOverride("_method")) ;
 app.engine( "ejs" , ejsMate) ;
 app.use(express.static(path.join(__dirname,"/public"))) ;
 
-
-app.get("/" , (req,res) => {
-    res.render('home.ejs') ;
-}) ;
-app.get("/login" , (req,res) => {
-    res.render('login.ejs') ;
-}) ;
-app.get("/register" , (req,res) => {
-    res.render('register.ejs') ;
-}) ;
-
-
-app.get("/tournaments", (req,res) =>{
-    res.render('tournaments/index.ejs') ;
-});
-
-app.get("/contact" , (req,res) => {
-    res.render("tournaments/contact.ejs") ;
-}) ;
-app.get("/about" , (req,res) => {
-    res.render("tournaments/about.ejs") ;
-}) ;
-
+// --- MOUNT ROUTES ---
+// All routes from routes/index.js will be prefixed with "/"
+const indexRoutes = require("./routes/index.js");
+app.use(indexRoutes);
 
 // app.get("/test" , async (req,res) => {
 //     let sample = new Tournament({
