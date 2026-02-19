@@ -5,6 +5,10 @@ const path = require("path")
 const methodOverride = require("method-override") ;
 const ejsMate = require("ejs-mate") ;
 const Tournament = require("./models/tournament.js") ;
+const session = require("express-session");
+const flash = require("connect-flash");
+const passport = require("passport");
+const LocalStrategy = require("passport-local").Strategy;
 
 const MONGO_URL = "mongodb://127.0.0.1:27017/battlearena" ;
 main()
@@ -26,26 +30,34 @@ app.use(methodOverride("_method")) ;
 app.engine( "ejs" , ejsMate) ;
 app.use(express.static(path.join(__dirname,"/public"))) ;
 
-// --- MOUNT ROUTES ---
+// Session & Flash
+app.use(session({
+    secret: "battle-arena-secret-key",
+    resave: false,
+    saveUninitialized: false
+}));
+app.use(flash());
+
+// Passport Configuration
+app.use(passport.initialize());
+app.use(passport.session());
+
+const User = require("./models/user.js");
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+// Make user available in all templates
+app.use((req, res, next) => {
+    res.locals.currentUser = req.user || null;
+    res.locals.success = req.flash("success");
+    res.locals.error = req.flash("error");
+    next();
+});
+
 // All routes from routes/index.js will be prefixed with "/"
 const indexRoutes = require("./routes/index.js");
 app.use(indexRoutes);
-
-// app.get("/test" , async (req,res) => {
-//     let sample = new Tournament({
-//         title : "Solo Cup Feb 2026" ,
-//         description: "lohhhanbsmndshdshsavdjsahvdsabdvsdbasvdshgscavhgds",
-//         game : " free fire" ,
-//         mode : "solo",
-//         slots: 256 ,
-//         pool : 100000 ,
-//         timing : new Date()
-//     }) ;
-//     await sample.save() ;
-//     console.log("sample was saved");
-//     res.send("successful testing") ;
-
-// });
 
 app.listen( 8080 , () => {
     console.log(" server is listening.. ") ;
