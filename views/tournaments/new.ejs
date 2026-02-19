@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Tournament</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('../includes/navbar') %>
+    
+    <main>
+        <div class="container">
+            <h1>Create New Tournament</h1>
+            
+            <form action="/tournaments" method="POST" class="form">
+                <label>Title</label>
+                <input type="text" name="tournament[title]" required>
+                
+                <label>Game</label>
+                <input type="text" name="tournament[game]" required>
+                
+                <label>Mode (Solo/Duo/Squad)</label>
+                <input type="text" name="tournament[mode]">
+                
+                <label>Slots</label>
+                <input type="number" name="tournament[slots]">
+                
+                <label>Prize Pool</label>
+                <input type="text" name="tournament[pool]">
+                
+                <label>Description</label>
+                <textarea name="tournament[description]"></textarea>
+                
+                <label>Timing</label>
+                <input type="datetime-local" name="tournament[timing]">
+                
+                <button type="submit" class="btn">Create Tournament</button>
+            </form>
+        </div>
+    </main>
+    
+    <%- include('../includes/footer') %>
+</body>
+</html>

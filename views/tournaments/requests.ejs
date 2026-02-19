@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Join Requests</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('../includes/navbar') %>
+    
+    <main>
+        <div class="container">
+            <h1>Join Requests for <%= tournament.title %></h1>
+            
+            <% if (tournament.joinRequests.length === 0) { %>
+                <p>No requests yet.</p>
+            <% } else { %>
+                <ul class="request-list">
+                    <% tournament.joinRequests.forEach((req) => { %>
+                        <li class="request-item">
+                            <span><%= req.player.username %> - <strong><%= req.status %></strong></span>
+                            
+                            <% if (req.status === "pending") { %>
+                                <form action="/tournaments/<%= tournament._id %>/requests/<%= req.player._id %>?_method=PUT" method="POST">
+                                    <input type="hidden" name="action" value="accepted">
+                                    <button class="btn btn-success">Accept</button>
+                                </form>
+                                
+                                <form action="/tournaments/<%= tournament._id %>/requests/<%= req.player._id %>?_method=PUT" method="POST">
+                                    <input type="hidden" name="action" value="rejected">
+                                    <button class="btn btn-danger">Reject</button>
+                                </form>
+                            <% } %>
+                        </li>
+                    <% }) %>
+                </ul>
+            <% } %>
+            
+            <a href="/tournaments/<%= tournament._id %>" class="btn">Back</a>
+        </div>
+    </main>
+    
+    <%- include('../includes/footer') %>
+</body>
+</html>

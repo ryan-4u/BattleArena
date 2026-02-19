@@ -1,22 +1,38 @@
-<% layout("/layouts/boilerplate.ejs") %>
-
-<p> Lorem ipsum dolor, sit amet consectetur adipisicing elit. A rerum quibusdam minus ab ullam quaerat magni ut deleniti aperiam praesentium inventore fuga totam id ducimus excepturi exercitationem nulla, tempora nam!
-Quae nesciunt officiis deserunt repellat soluta officia animi et itaque quos velit similique odio rerum eum, tempore cumque non? Fuga possimus magni incidunt voluptatum sed, sunt exercitationem dolore eaque veniam?
-Ut quaerat eos deserunt placeat labore amet assumenda dolores pariatur. Necessitatibus sit quasi architecto ad obcaecati labore illum magnam excepturi totam hic at, eius sint, a, harum ratione autem corrupti.
-Vero cumque in quo a soluta ea beatae, deleniti nesciunt, consequatur amet similique libero illum excepturi doloribus ad modi nostrum enim ipsam quae nam veniam quisquam neque! Iste, incidunt repellendus.
-Optio aperiam sequi fugiat voluptas autem dolorum assumenda nesciunt. Magni dolor commodi iusto est assumenda repellendus consequatur, in repudiandae beatae porro at sit possimus cupiditate autem sapiente atque inventore laboriosam?
-Aut neque omnis consectetur est vitae aperiam fuga optio suscipit ad nostrum, pariatur soluta similique, at voluptatem obcaecati itaque consequatur! Expedita excepturi temporibus odit quos modi repellendus ullam vel exercitationem.
-Mollitia deserunt, ullam perspiciatis adipisci officiis quae ipsa amet iure eligendi voluptates cum neque hic explicabo maiores quaerat! Exercitationem magni est excepturi inventore voluptatem mollitia maiores, sunt dolores odio. Impedit.
-Repellat illum maxime, incidunt culpa molestiae quos sint quibusdam perferendis a facilis? Ducimus exercitationem minima maxime expedita tenetur totam, vel iusto est possimus voluptatum maiores voluptates, architecto et modi incidunt?
-Voluptatum consectetur voluptate consequatur nostrum cum asperiores temporibus! Eos vero ipsum adipisci sit rerum minima, repellat saepe minus eligendi modi possimus quibusdam quaerat dolorum beatae et provident voluptas ipsa quod.
-Maxime exercitationem rerum nobis magnam nisi beatae, at quos provident sequi quo temporibus voluptates error rem voluptas ducimus, itaque id sit ad eum voluptatum optio. Nostrum in illo eveniet repellat?
-Recusandae placeat sunt ea mollitia repellat nulla. Rem quod vel dolore nostrum minus beatae, tenetur obcaecati quaerat nam ratione sint, maxime natus sed, commodi vero id aliquid sapiente harum similique?
-Repudiandae, non quos neque eos cum quibusdam amet iste iure quas accusamus sequi reprehenderit voluptatum, fugit dolorum dicta! Animi ducimus, consectetur fugit quis ut incidunt adipisci atque ea pariatur numquam.
-Dolor quod vel autem dolore perferendis, omnis voluptatum minima eaque natus cupiditate mollitia similique totam molestias eum adipisci ea sapiente id illum itaque tempore in. Odio excepturi exercitationem architecto nam.
-Numquam mollitia quae consequuntur enim eaque, suscipit rem, aliquam, quaerat sequi nam deleniti voluptas hic saepe omnis minima molestiae officiis maxime! Vero beatae eum non laboriosam magni, mollitia libero recusandae!
-Sequi iusto facere minus blanditiis vero obcaecati molestiae velit repudiandae repellendus reiciendis. Modi quasi distinctio nam alias maiores quidem minus nemo, asperiores debitis inventore? Consectetur ad porro magni quis numquam!
-Ratione excepturi eaque dignissimos aliquid, ut sint accusamus dolore sunt porro distinctio natus id totam eveniet veritatis vel error? Praesentium earum vero, ex recusandae fugiat cupiditate error quaerat repellendus voluptate.
-Enim asperiores, debitis, vitae mollitia at tenetur, similique distinctio illum minima suscipit cupiditate aliquid molestias. Rerum sequi illo accusamus, reiciendis asperiores quisquam cupiditate eveniet voluptatem eum id officiis! Corrupti, quam!
-Voluptates, ipsa animi iusto, quis facilis voluptatum delectus sed unde modi, sapiente maxime deserunt saepe sit eaque deleniti quod corrupti. Nesciunt illum est fuga accusantium fugiat laborum omnis perspiciatis aliquid.
-Rem voluptates, illum eos hic quae animi earum est blanditiis aperiam explicabo, dignissimos error ipsa accusamus veritatis dolorem exercitationem? Sequi, aut aliquam laudantium quo et eveniet similique perferendis iste sapiente.
-Officia quibusdam totam quo porro blanditiis impedit beatae! Neque et dignissimos amet possimus! Est quo quod, dolor sint aliquid repellendus tempora, labore accusamus quae at beatae, omnis maiores eveniet provident?</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Tournaments</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('../includes/navbar') %>
+    
+    <main>
+        <div class="container">
+            <h1>All Tournaments</h1>
+            
+            <a href="/tournaments/new" class="btn">Create Tournament</a>
+            
+            <div class="tournament-grid">
+                <% if (tournaments.length === 0) { %>
+                    <p>No tournaments yet.</p>
+                <% } else { %>
+                    <% tournaments.forEach((tournament) => { %>
+                        <div class="card">
+                            <h3><%= tournament.title %></h3>
+                            <p>Game: <%= tournament.game %></p>
+                            <p>Mode: <%= tournament.mode %></p>
+                            <p>Prize: <%= tournament.pool %></p>
+                            <a href="/tournaments/<%= tournament._id %>" class="btn">View Details</a>
+                        </div>
+                    <% }) %>
+                <% } %>
+            </div>
+        </div>
+    </main>
+    
+    <%- include('../includes/footer') %>
+</body>
+</html>

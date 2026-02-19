@@ -53,4 +53,69 @@ router.delete("/:id", async (req, res) => {
     }
 });
 
+// Player clicks "Join" button
+router.post("/:id/join", async (req, res) => {
+    try {
+        const tournament = await Tournament.findById(req.params.id);
+        
+        // Check if already requested
+        const alreadyRequested = tournament.joinRequests.find(
+            r => r.player.toString() === req.body.userId // You'll get this from auth later
+        );
+        
+        if (alreadyRequested) {
+            return res.send("You have already requested to join this tournament");
+        }
+        
+        // Add player to joinRequests
+        tournament.joinRequests.push({ player: req.body.userId, status: "pending" });
+        await tournament.save();
+        
+        res.redirect(`/tournaments/${req.params.id}`);
+    } catch (err) {
+        console.log(err);
+        res.send("Error joining tournament");
+    }
+});
+
+// Organiser views requests for their tournament
+router.get("/:id/requests", async (req, res) => {
+    try {
+        const tournament = await Tournament.findById(req.params.id)
+            .populate("joinRequests.player", "username email");
+        
+        res.render("tournaments/requests.ejs", { tournament });
+    } catch (err) {
+        console.log(err);
+        res.send("Error");
+    }
+});
+
+// Organiser accepts or rejects a player
+router.put("/:id/requests/:playerId", async (req, res) => {
+    try {
+        const { id, playerId } = req.params;
+        const { action } = req.body; // action = "accepted" or "rejected"
+        
+        const tournament = await Tournament.findById(id);
+        const request = tournament.joinRequests.find(r => r.player.toString() === playerId);
+        
+        if (request) {
+            request.status = action;
+            
+            // If accepted, add to participants
+            if (action === "accepted") {
+                tournament.participants.push(playerId);
+            }
+            
+            await tournament.save();
+        }
+        
+        res.redirect(`/tournaments/${id}/requests`);
+    } catch (err) {
+        console.log(err);
+        res.send("Error");
+    }
+});
+
 module.exports = router;

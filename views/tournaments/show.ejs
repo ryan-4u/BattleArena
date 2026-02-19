@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><%= tournament.title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('../includes/navbar') %>
+    
+    <main>
+        <div class="container">
+            <h1><%= tournament.title %></h1>
+            
+            <div class="details">
+                <p><strong>Game:</strong> <%= tournament.game %></p>
+                <p><strong>Mode:</strong> <%= tournament.mode %></p>
+                <p><strong>Slots:</strong> <%= tournament.slots %></p>
+                <p><strong>Prize Pool:</strong> <%= tournament.pool %></p>
+                <p><strong>Description:</strong> <%= tournament.description %></p>
+                <p><strong>Timing:</strong> <%= tournament.timing %></p>
+            </div>
+            
+            <!-- Join Button -->
+            <form action="/tournaments/<%= tournament._id %>/join" method="POST">
+                <input type="hidden" name="userId" value="dummy-user-id">
+                <button type="submit" class="btn">Join Tournament</button>
+            </form>
+            
+            <!-- View Requests Button -->
+            <a href="/tournaments/<%= tournament._id %>/requests" class="btn">View Join Requests</a>
+            
+            <!-- Delete Button -->
+            <form action="/tournaments/<%= tournament._id %>?_method=DELETE" method="POST" style="margin-top: 20px;">
+                <button type="submit" class="btn btn-danger">Delete Tournament</button>
+            </form>
+        </div>
+    </main>
+    
+    <%- include('../includes/footer') %>
+</body>
+</html>
