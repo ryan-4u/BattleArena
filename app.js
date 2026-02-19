@@ -43,9 +43,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 const User = require("./models/user.js");
-passport.use(new LocalStrategy(User.authenticate()));
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
 
 // Make user available in all templates
 app.use((req, res, next) => {
