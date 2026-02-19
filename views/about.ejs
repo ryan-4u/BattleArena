@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Battle Arena</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+<body>
+    <%- include("./includes/navbar.ejs") %>
+
+    <!-- Hero Section -->
+    <section class="hero bg-primary text-white py-5" style="background-color: #e7f0fa;">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-lg-6">
+            <h1 class="display-4 fw-bold" style="color: #2e5e99;">About Our Esports Platform</h1>
+            <p class="lead" style="color: #0d2440;">We're passionate about building the ultimate hub for esports enthusiasts. From hosting thrilling tournaments to connecting players worldwide.</p>
+          </div>
+          <div class="col-lg-6 text-center">
+            <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Esports team celebrating a win" class="img-fluid rounded shadow" style="max-height: 400px;">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mission and Vision Section -->
+    <section class="py-5 bg-light" style="background-color: #e7f0fa;">
+      <div class="container">
+        <div class="row g-4">
+          <div class="col-lg-6">
+            <h2 class="mb-4 fw-bold" style="color: #2e5e99;">Our Mission</h2>
+            <p style="color: #0d2440;">To democratize esports by providing accessible, secure, and exciting tools for organizers and players alike.</p>
+          </div>
+          <div class="col-lg-6">
+            <h2 class="mb-4 fw-bold" style="color: #2e5e99;">Our Vision</h2>
+            <p style="color: #0d2440;">To become the go-to platform for global esports tournaments, fostering a vibrant community where innovation meets competition.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Platform Story Section -->
+    <section class="py-5" style="background-color: #7ba4d0;">
+      <div class="container text-center">
+        <h2 class="mb-4 fw-bold text-white">Our Story</h2>
+        <p class="text-white-50 mb-4">Founded in 2020 by a team of avid gamers and tech innovators, our platform started as a simple idea: to make esports tournaments easier and more fun.</p>
+      </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="py-5 bg-light" style="background-color: #e7f0fa;">
+      <div class="container">
+        <h2 class="text-center mb-5 fw-bold" style="color: #2e5e99;">Meet the Team</h2>
+        <div class="row g-4">
+          <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm text-center" style="background-color: white;">
+              <div class="card-body">
+                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Team member" class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;">
+                <h5 class="card-title" style="color: #2e5e99;">Alex Rivera</h5>
+                <p class="card-text" style="color: #0d2440;">Founder & CEO</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm text-center" style="background-color: white;">
+              <div class="card-body">
+                <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Team member" class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;">
+                <h5 class="card-title" style="color: #2e5e99;">Jordan Lee</h5>
+                <p class="card-text" style="color: #0d2440;">Head of Development</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm text-center" style="background-color: white;">
+              <div class="card-body">
+                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Team member" class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;">
+                <h5 class="card-title" style="color: #2e5e99;">Taylor Kim</h5>
+                <p class="card-text" style="color: #0d2440;">Community Manager</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Call to Action Section -->
+    <section class="py-5 text-center" style="background-color: #2e5e99;">
+      <div class="container">
+        <h2 class="text-white mb-3">Join the Esports Revolution</h2>
+        <p class="text-white-50 mb-4">Sign up today and start your esports journey with us.</p>
+        <a href="/register" class="btn btn-lg" style="background-color: #7ba4d0; color: white; border: none;">Get Started</a>
+      </div>
+    </section>
+
+    <%- include("./includes/footer.ejs") %>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/script.js"></script>
+</body>
+</html>

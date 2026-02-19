@@ -2,39 +2,68 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Battle Arena</title>
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/login.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Register</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/connect.css">
 </head>
 <body>
-    <%- include("../includes/navbar.ejs") %>
 
-    <div class="content">
-        <div class="login-container">
-            <div class="login-card">
-                <h2 class="login-title">Login</h2>
-                <form id="loginForm">
-                    <div class="mb-3">
-                        <label class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" required>
-                    </div>
-                    <button type="submit" class="btn btn-login">Login</button>
-                </form>
-                <a href="/register" class="login-link">Don't have an account? Register</a>
+<div class="login-container">
+    <div class="login-card shadow">
+        <h3 class="login-title">Register</h3>
+
+        <form id="registerForm">
+            <!-- Name -->
+            <div class="mb-3">
+                <label class="form-label">Name</label>
+                <input type="text" class="form-control" placeholder="Enter your name" required>
             </div>
-        </div>
-    </div>
 
-    <%- include("../includes/footer.ejs") %>
-    <script src="/js/script.js"></script>
-    <script src="/js/login.js"></script>
+            <!-- Age -->
+            <div class="mb-3">
+                <label class="form-label">Age</label>
+                <input type="number" class="form-control" placeholder="Enter your age" required>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" placeholder="Enter your email" required>
+            </div>
+
+            <!-- Role -->
+            <div class="mb-3">
+                <label class="form-label d-block">Role</label>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="role" value="Organizer" required>
+                    <label class="form-check-label">Organizer</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="role" value="Player">
+                    <label class="form-check-label">Player</label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-login w-100">Register</button>
+
+            <div class="text-center mt-3">
+                <a href="index.html" class="login-link">Already have an account? Login</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Custom JS -->
+<script src="js/connect.js"></script>
 </body>
 </html>
