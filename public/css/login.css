@@ -1,0 +1,55 @@
+/* Login/Register Page Specific Styles */
+
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #E7F0FA;
+}
+
+.login-card {
+    background-color: #ffffff;
+    border: 2px solid #7BA4D0;
+    border-radius: 12px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 380px;
+}
+
+.login-title {
+    text-align: center;
+    color: #2E5E99;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+.form-label {
+    color: #0D2440;
+    font-weight: 500;
+}
+
+.btn-login {
+    background-color: #2E5E99;
+    color: #ffffff;
+    border: none;
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.btn-login:hover {
+    background-color: #0D2440;
+}
+
+.login-link {
+    color: #2E5E99;
+    text-decoration: none;
+    text-align: center;
+    display: block;
+    margin-top: 1rem;
+}
+
+.login-link:hover {
+    text-decoration: underline;
+}
