@@ -87,4 +87,22 @@ router.delete("/:id", isLoggedIn, isOrganiser, isTournamentOwner, async (req, re
   res.redirect("/tournaments");
 });
 
+// Update room details (organiser only)
+router.patch("/:id/room", isLoggedIn, isOrganiser, isTournamentOwner, async (req, res) => {
+  const { roomId, roomPassword } = req.body;
+
+  if (!roomId || !roomPassword) {
+    req.flash("error", "Both Room ID and Password are required.");
+    return res.redirect(`/tournaments/${req.params.id}`);
+  }
+
+  await Tournament.findByIdAndUpdate(req.params.id, {
+    roomId:       roomId.trim(),
+    roomPassword: roomPassword.trim()
+  });
+
+  req.flash("success", "Room details updated. Accepted players can now see them.");
+  res.redirect(`/tournaments/${req.params.id}`);
+});
+
 module.exports = router;

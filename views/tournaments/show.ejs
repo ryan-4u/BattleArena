@@ -169,6 +169,71 @@
               </button>
             </form>
           </div>
+
+          <!-- Room Details Update -->
+          <div class="card ba-card mb-4">
+            <div class="card-body p-4">
+              <p style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:var(--cyber-blue); letter-spacing:0.2em; margin-bottom:16px;">
+                // ROOM DETAILS
+              </p>
+
+              <% if (tournament.roomId || tournament.roomPassword) { %>
+                <div class="row g-2 mb-4">
+                  <div class="col-md-6">
+                    <span style="font-family:'Share Tech Mono',monospace; font-size:0.62rem; color:#475569; letter-spacing:0.15em;">
+                      CURRENT ROOM ID
+                    </span>
+                    <div style="font-size:1rem; font-weight:700; color:var(--cyber-blue); letter-spacing:0.1em; margin-top:4px;">
+                      <%= tournament.roomId || '—' %>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <span style="font-family:'Share Tech Mono',monospace; font-size:0.62rem; color:#475569; letter-spacing:0.15em;">
+                      CURRENT PASSWORD
+                    </span>
+                    <div style="font-size:1rem; font-weight:700; color:var(--cyber-blue); letter-spacing:0.1em; margin-top:4px;">
+                      <%= tournament.roomPassword || '—' %>
+                    </div>
+                  </div>
+                </div>
+              <% } else { %>
+                <p style="font-size:0.8rem; color:#475569; margin-bottom:16px;">
+                  No room details set yet. Add them below so accepted players can join.
+                </p>
+              <% } %>
+
+              <form action="/tournaments/<%= tournament._id %>/room?_method=PATCH" method="POST">
+                <div class="row g-2">
+                  <div class="col-md-5">
+                    <input
+                      type="text"
+                      name="roomId"
+                      class="form-control"
+                      placeholder="Room ID"
+                      value="<%= tournament.roomId || '' %>"
+                      required
+                    />
+                  </div>
+                  <div class="col-md-5">
+                    <input
+                      type="text"
+                      name="roomPassword"
+                      class="form-control"
+                      placeholder="Room Password"
+                      value="<%= tournament.roomPassword || '' %>"
+                      required
+                    />
+                  </div>
+                  <div class="col-md-2">
+                    <button type="submit" class="btn btn-warning w-100">
+                      <i class="bi bi-save"></i> Save
+                    </button>
+                  </div>
+                </div>
+              </form>
+
+            </div>
+          </div>
         <% } %>
 
         <!-- Apply Section -->
