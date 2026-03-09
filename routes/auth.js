@@ -1,15 +1,35 @@
+require("dotenv").config();
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const User = require("../models/user");
+const Tournament = require("../models/tournament");
 
-// Home → redirect to tournaments
-router.get("/", (req, res) => res.redirect("/tournaments"));
+// Home — landing page
+router.get("/", async (req, res) => {
+  const featuredTournaments = await Tournament.find({
+    status: { $in: ["ongoing", "upcoming"] }
+  }).limit(4).sort({ createdAt: -1 });
+
+  const totalTournaments = await Tournament.countDocuments();
+  const totalPlayers     = await User.countDocuments({ role: "player" });
+  const completed        = await Tournament.countDocuments({ status: "completed" });
+
+  res.render("landing", {
+    featuredTournaments,
+    stats: {
+      tournaments: totalTournaments,
+      players: totalPlayers,
+      completed: completed,
+      prizeTotal: 80
+    }
+  });
+});
 
 // Register
 router.get("/register", (req, res) => res.render("auth/register"));
 
-router.post("/register", async (req, res) => {
+router.post("/register", async (req, res, next) => {
   try {
     const { username, email, password, role, gameUsername, bio } = req.body;
     const user = new User({ username, email, role, gameUsername, bio });
