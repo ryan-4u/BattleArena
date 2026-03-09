@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard | BattleArena</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="ba-bg">
+  <%- include('../partials/navbar') %>
+  <div class="container my-5">
+    <%- include('../partials/flash') %>
+
+    <div class="mb-4">
+      <p class="cyber-tag-line mb-1">// ADMIN PANEL</p>
+      <h2 class="fw-bold mb-0">Dashboard</h2>
+    </div>
+
+    <!-- Nav tabs -->
+    <div class="d-flex gap-2 mb-4 flex-wrap">
+      <a href="/admin" class="btn btn-warning btn-sm">Dashboard</a>
+      <a href="/admin/users" class="btn btn-outline-warning btn-sm">Users</a>
+      <a href="/admin/tournaments" class="btn btn-outline-warning btn-sm">Tournaments</a>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3">
+        <div class="ba-stat-box text-center">
+          <div class="fs-4 fw-bold" style="color:var(--cyber-blue);"><%= stats.totalUsers %></div>
+          <div class="small">Total Users</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="ba-stat-box text-center">
+          <div class="fs-4 fw-bold" style="color:var(--cyber-blue);"><%= stats.totalPlayers %></div>
+          <div class="small">Players</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="ba-stat-box text-center">
+          <div class="fs-4 fw-bold" style="color:var(--cyber-blue);"><%= stats.totalOrganisers %></div>
+          <div class="small">Organisers</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="ba-stat-box text-center">
+          <div class="fs-4 fw-bold" style="color:#ef4444;"><%= stats.bannedUsers %></div>
+          <div class="small">Banned Users</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="ba-stat-box text-center">
+          <div class="fs-4 fw-bold" style="color:var(--cyber-blue);"><%= stats.totalTournaments %></div>
+          <div class="small">Total Tournaments</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="ba-stat-box text-center">
+          <div class="fs-4 fw-bold" style="color:#22c55e;"><%= stats.activeTournaments %></div>
+          <div class="small">Active Tournaments</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="ba-stat-box text-center">
+          <div class="fs-4 fw-bold" style="color:#ef4444;"><%= stats.blockedTournaments %></div>
+          <div class="small">Blocked Tournaments</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick links -->
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="card ba-card p-4">
+          <h6 class="fw-bold mb-3"><i class="bi bi-people-fill text-warning"></i> User Management</h6>
+          <p class="small" style="color:#475569;">View all players and organisers. Ban suspicious accounts or change roles.</p>
+          <a href="/admin/users" class="btn btn-outline-warning btn-sm">Manage Users →</a>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card ba-card p-4">
+          <h6 class="fw-bold mb-3"><i class="bi bi-trophy-fill text-warning"></i> Tournament Management</h6>
+          <p class="small" style="color:#475569;">Review all tournaments. Block fake or rule-violating tournaments from public view.</p>
+          <a href="/admin/tournaments" class="btn btn-outline-warning btn-sm">Manage Tournaments →</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

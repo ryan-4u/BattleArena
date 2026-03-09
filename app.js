@@ -11,6 +11,7 @@ const authRoutes = require("./routes/auth");
 const tournamentRoutes = require("./routes/tournament");
 const applicationRoutes = require("./routes/application");
 const profileRoutes = require("./routes/profile");
+const adminRoutes = require("./routes/admin");
 
 const app = express();
 
@@ -59,6 +60,7 @@ app.use((req, res, next) => {
 
 // Routes
 app.use("/", authRoutes);
+app.use("/admin", adminRoutes);
 app.use("/tournaments", tournamentRoutes);
 app.use("/tournaments", applicationRoutes);
 app.use("/profile", profileRoutes);

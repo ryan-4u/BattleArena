@@ -53,7 +53,11 @@ router.post("/login",
     failureFlash: true,
     failureRedirect: "/login"
   }),
-  (req, res) => {
+  async (req, res) => {
+    if (req.user.banned) {
+      req.logout(err => { if (err) console.log(err); });
+      return res.redirect("/banned?reason=" + encodeURIComponent(req.user.banReason || "Violation of terms."));
+    }
     req.flash("success", `Welcome back, ${req.user.username}!`);
     res.redirect("/tournaments");
   }
@@ -66,6 +70,11 @@ router.get("/logout", (req, res, next) => {
     req.flash("success", "Logged out successfully.");
     res.redirect("/login");
   });
+});
+
+// Banned page
+router.get("/banned", (req, res) => {
+  res.render("auth/banned", { query: req.query });
 });
 
 module.exports = router;

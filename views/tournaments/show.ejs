@@ -12,6 +12,25 @@
   <%- include('../partials/navbar') %>
   <div class="container my-5">
     <%- include('../partials/flash') %>
+    <!-- Blocked warning — visible to organiser and admin only -->
+    <% if (tournament.blocked) { %>
+      <div class="alert mb-4" style="background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.4); border-left-width:4px; border-radius:0;">
+        <div style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:#ef4444; letter-spacing:0.2em; margin-bottom:6px;">
+          ⚠ TOURNAMENT BLOCKED BY ADMIN
+        </div>
+        <p style="font-size:0.83rem; color:#fca5a5; margin-bottom:4px;">
+          This tournament has been hidden from public view and players cannot apply.
+        </p>
+        <% if (tournament.blockedReason) { %>
+          <p style="font-family:'Share Tech Mono',monospace; font-size:0.72rem; color:#ef4444; margin:0;">
+            REASON: <%= tournament.blockedReason %>
+          </p>
+        <% } %>
+        <p style="font-size:0.75rem; color:#475569; margin-top:8px; margin-bottom:0;">
+          If you believe this is a mistake, contact the platform admin.
+        </p>
+      </div>
+    <% } %>
 
     <div class="row g-4">
 
@@ -167,6 +186,10 @@
             <% if (tournament.status === 'completed') { %>
               <div class="alert alert-info">
                 <i class="bi bi-flag-fill"></i> This tournament has ended.
+              </div>
+            <% } else if (tournament.blocked) { %>
+              <div class="alert alert-danger">
+                <i class="bi bi-slash-circle"></i> Applications are currently closed for this tournament.
               </div>
             <% } else { %>
               <form action="/tournaments/<%= tournament._id %>/apply" method="POST">

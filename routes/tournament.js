@@ -6,9 +6,9 @@ const { isLoggedIn, isOrganiser, isTournamentOwner } = require("../middleware");
 // INDEX
 router.get("/", async (req, res) => {
   const { search, game, status } = req.query;
-  let filter = {};
+  let filter = { blocked: false }; // hide blocked tournaments
   if (search) filter.title = { $regex: search, $options: "i" };
-  if (game) filter.game = { $regex: game, $options: "i" };
+  if (game)   filter.game  = { $regex: game,   $options: "i" };
   if (status) filter.status = status;
 
   const tournaments = await Tournament.find(filter).populate("organiser").sort({ createdAt: -1 });
@@ -46,7 +46,16 @@ router.get("/:id", async (req, res) => {
     return res.redirect("/tournaments");
   }
 
-  // Check if current user is accepted
+  // If blocked and viewer is not organiser or admin — deny access
+  if (tournament.blocked) {
+    const isOwner = req.user && tournament.organiser._id.equals(req.user._id);
+    const isAdmin = req.user && req.user.role === "admin";
+    if (!isOwner && !isAdmin) {
+      req.flash("error", "This tournament has been removed by an admin.");
+      return res.redirect("/tournaments");
+    }
+  }
+
   let isAccepted = false;
   if (req.user) {
     const entry = tournament.applicants.find(

@@ -45,7 +45,9 @@ const tournamentSchema = new mongoose.Schema({
   applicants: [applicantSchema],
   // Hidden from players unless accepted
   roomId: { type: String, default: "" },
-  roomPassword: { type: String, default: "" }
+  roomPassword: { type: String, default: "" } ,
+  blocked:      { type: Boolean, default: false },
+  blockedReason:{ type: String, default: "" }
 }, { timestamps: true });
 
 module.exports = mongoose.model("Tournament", tournamentSchema);

@@ -5,6 +5,12 @@ module.exports.isLoggedIn = (req, res, next) => {
     req.flash("error", "You must be logged in to do that.");
     return res.redirect("/login");
   }
+  if (req.user.banned) {
+    req.logout(err => {
+      if (err) return next(err);
+      return res.redirect("/banned");
+    });
+  }
   next();
 };
 
@@ -34,6 +40,14 @@ module.exports.isTournamentOwner = async (req, res, next) => {
   if (!tournament.organiser.equals(req.user._id)) {
     req.flash("error", "You are not the organiser of this tournament.");
     return res.redirect(`/tournaments/${id}`);
+  }
+  next();
+};
+
+module.exports.isAdmin = (req, res, next) => {
+  if (!req.user || req.user.role !== "admin") {
+    req.flash("error", "Access denied.");
+    return res.redirect("/tournaments");
   }
   next();
 };
