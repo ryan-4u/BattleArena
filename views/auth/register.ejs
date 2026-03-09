@@ -15,25 +15,30 @@
             <h3 class="mb-4 fw-bold text-center">
               <i class="bi bi-controller text-warning"></i> Join BattleArena
             </h3>
-            <form action="/register" method="POST">
+            <form action="/register" method="POST" id="registerForm" novalidate>
               <div class="mb-3">
                 <label class="form-label fw-semibold">Username</label>
-                <input type="text" name="username" class="form-control" placeholder="e.g. ProSniper99" required/>
+                <input type="text" name="username" id="username" class="form-control" placeholder="e.g. ProSniper99" required/>
+                <div class="invalid-feedback">Username is required.</div>
               </div>
               <div class="mb-3">
                 <label class="form-label fw-semibold">Email</label>
-                <input type="email" name="email" class="form-control" required/>
+                <input type="email" name="email" id="email" class="form-control" required/>
+                <div class="invalid-feedback">Enter a valid email address.</div>
               </div>
               <div class="mb-3">
                 <label class="form-label fw-semibold">Password</label>
-                <input type="password" name="password" class="form-control" required/>
+                <input type="password" name="password" id="password" class="form-control" required/>
+                <div class="invalid-feedback">Password must be at least 6 characters.</div>
               </div>
               <div class="mb-3">
                 <label class="form-label fw-semibold">I am a...</label>
-                <select name="role" class="form-select" required>
+                <select name="role" id="role" class="form-select" required>
+                  <option value="">Select a role...</option>
                   <option value="player">🎮 Player — I want to join tournaments</option>
                   <option value="organiser">🏆 Organiser — I want to host tournaments</option>
                 </select>
+                <div class="invalid-feedback">Please select a role.</div>
               </div>
               <div class="mb-3">
                 <label class="form-label fw-semibold">In-Game Username <span class="text-muted fw-normal">(optional)</span></label>
@@ -54,5 +59,6 @@
     </div>
   </div>
   <%- include('../partials/scripts') %>
+  <script src="/js/auth-form.js"></script>
 </body>
 </html>
