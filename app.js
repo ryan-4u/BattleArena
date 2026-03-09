@@ -6,6 +6,8 @@ const methodOverride = require("method-override");
 const session = require("express-session");
 const flash = require("connect-flash");
 const passport = require("passport");
+const { autoUpdateTournamentStatus } = require("./middleware");
+
 
 const authRoutes = require("./routes/auth");
 const tournamentRoutes = require("./routes/tournament");
@@ -58,6 +60,7 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(autoUpdateTournamentStatus);
 // Routes
 app.use("/", authRoutes);
 app.use("/admin", adminRoutes);

@@ -51,3 +51,23 @@ module.exports.isAdmin = (req, res, next) => {
   }
   next();
 };
+
+module.exports.autoUpdateTournamentStatus = async (req, res, next) => {
+  try {
+    const Tournament = require("./models/tournament");
+    const now = new Date();
+
+    await Tournament.updateMany(
+      { status: "upcoming", startDate: { $lte: now } },
+      { $set: { status: "ongoing" } }
+    );
+
+    await Tournament.updateMany(
+      { status: "ongoing", registrationDeadline: { $lte: now }, startDate: { $lte: now } },
+      { $set: { status: "completed" } }
+    );
+  } catch (err) {
+    console.error("Status auto-update error:", err);
+  }
+  next();
+};

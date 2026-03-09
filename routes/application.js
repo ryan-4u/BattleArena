@@ -108,4 +108,36 @@ router.patch("/:id/applicants/:uid/reject", isLoggedIn, isOrganiser, async (req,
   res.redirect(`/tournaments/${req.params.id}`);
 });
 
+// Withdraw application (player only, pending only)
+router.delete("/:id/withdraw", isLoggedIn, isPlayer, async (req, res) => {
+  const tournament = await Tournament.findById(req.params.id);
+
+  if (!tournament) {
+    req.flash("error", "Tournament not found.");
+    return res.redirect("/tournaments");
+  }
+
+  const app = tournament.applicants.find(
+    a => a.player.equals(req.user._id)
+  );
+
+  if (!app) {
+    req.flash("error", "You haven't applied to this tournament.");
+    return res.redirect(`/tournaments/${req.params.id}`);
+  }
+
+  if (app.status !== "pending") {
+    req.flash("error", "You can only withdraw a pending application.");
+    return res.redirect(`/tournaments/${req.params.id}`);
+  }
+
+  tournament.applicants = tournament.applicants.filter(
+    a => !a.player.equals(req.user._id)
+  );
+  await tournament.save();
+
+  req.flash("success", "Application withdrawn.");
+  res.redirect(`/tournaments/${req.params.id}`);
+});
+
 module.exports = router;
