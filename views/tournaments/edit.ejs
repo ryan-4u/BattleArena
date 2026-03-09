@@ -17,98 +17,279 @@
         <div class="card shadow border-0 ba-card">
           <div class="card-body p-4">
             <h3 class="fw-bold mb-4"><i class="bi bi-pencil-square text-warning"></i> Edit Tournament</h3>
-            <form action="/tournaments/<%= tournament._id %>?_method=PUT" method="POST">
+
+            <form action="/tournaments/<%= tournament._id %>?_method=PUT" method="POST"
+              id="editForm" novalidate>
 
               <div class="mb-3">
-                <label class="form-label fw-semibold">Title</label>
-                <input type="text" name="tournament[title]" class="form-control" value="<%= tournament.title %>" required/>
+                <label class="form-label fw-semibold">Tournament Title</label>
+                <input type="text" name="tournament[title]" class="form-control" id="title"
+                  value="<%= tournament.title %>" required minlength="3"/>
+                <div class="invalid-feedback">Title must be at least 3 characters.</div>
               </div>
 
               <div class="row g-3 mb-3">
                 <div class="col-md-6">
                   <label class="form-label fw-semibold">Game</label>
-                  <input type="text" name="tournament[game]" class="form-control" value="<%= tournament.game %>" required/>
+                  <input type="text" name="tournament[game]" class="form-control" id="game"
+                    value="<%= tournament.game %>" required/>
+                  <div class="invalid-feedback">Please enter the game name.</div>
                 </div>
                 <div class="col-md-6">
                   <label class="form-label fw-semibold">Mode</label>
-                  <select name="tournament[mode]" class="form-select">
-                    <option value="Solo" <%= tournament.mode === 'Solo' ? 'selected' : '' %>>Solo</option>
-                    <option value="Duo" <%= tournament.mode === 'Duo' ? 'selected' : '' %>>Duo</option>
+                  <select name="tournament[mode]" class="form-select" id="mode" required>
+                    <option value="">-- Select Mode --</option>
+                    <option value="Solo"  <%= tournament.mode === 'Solo'  ? 'selected' : '' %>>Solo</option>
+                    <option value="Duo"   <%= tournament.mode === 'Duo'   ? 'selected' : '' %>>Duo</option>
                     <option value="Squad" <%= tournament.mode === 'Squad' ? 'selected' : '' %>>Squad</option>
                   </select>
+                  <div class="invalid-feedback">Please select a mode.</div>
                 </div>
               </div>
 
               <div class="mb-3">
                 <label class="form-label fw-semibold">Description</label>
-                <textarea name="tournament[description]" class="form-control" rows="3" required><%= tournament.description %></textarea>
+                <textarea name="tournament[description]" class="form-control" id="description"
+                  rows="3" required minlength="10"><%= tournament.description %></textarea>
+                <div class="invalid-feedback">Description must be at least 10 characters.</div>
               </div>
 
               <div class="mb-3">
                 <label class="form-label fw-semibold">Rules</label>
-                <textarea name="tournament[rules]" class="form-control" rows="3"><%= tournament.rules %></textarea>
+                <div id="rulesContainer">
+                  <%
+                    const existingRules = tournament.rules
+                      ? tournament.rules.split('\n').filter(r => r.trim()).map(r => r.replace(/^\d+\.\s*/, ''))
+                      : [''];
+                  %>
+                  <% existingRules.forEach((rule, idx) => { %>
+                    <div class="rule-item d-flex gap-2 mb-2">
+                      <span class="rule-number cyber-tag-line pt-2">
+                        <%= String(idx + 1).padStart(2, '0') %>.
+                      </span>
+                      <input type="text" class="form-control rule-input"
+                        placeholder="Add a rule..." value="<%= rule %>"/>
+                      <button type="button" class="btn btn-outline-danger btn-sm remove-rule"
+                        style="<%= existingRules.length <= 1 ? 'display:none' : '' %>">
+                        <i class="bi bi-x"></i>
+                      </button>
+                    </div>
+                  <% }) %>
+                </div>
+                <input type="hidden" name="tournament[rules]" id="rulesHidden"/>
+                <button type="button" class="btn btn-outline-warning btn-sm mt-1" id="addRuleBtn">
+                  <i class="bi bi-plus"></i> Add Rule
+                </button>
+                <div class="text-danger small mt-1" id="rulesError" style="display:none;"></div>
               </div>
 
               <div class="row g-3 mb-3">
                 <div class="col-md-6">
                   <label class="form-label fw-semibold">Prize Pool</label>
-                  <input type="text" name="tournament[prizePool]" class="form-control" value="<%= tournament.prizePool %>"/>
+                  <input type="text" name="tournament[prizePool]" class="form-control"
+                    value="<%= tournament.prizePool %>"/>
                 </div>
                 <div class="col-md-6">
                   <label class="form-label fw-semibold">Entry Fee (₹)</label>
-                  <input type="number" name="tournament[entryFee]" class="form-control" value="<%= tournament.entryFee %>" min="0"/>
+                  <input type="number" name="tournament[entryFee]" class="form-control"
+                    id="entryFee" value="<%= tournament.entryFee %>" min="0"/>
+                  <div class="invalid-feedback">Entry fee cannot be negative.</div>
                 </div>
               </div>
 
               <div class="row g-3 mb-3">
                 <div class="col-md-4">
                   <label class="form-label fw-semibold">Max Players</label>
-                  <input type="number" name="tournament[maxPlayers]" class="form-control" value="<%= tournament.maxPlayers %>" min="2"/>
+                  <input type="number" name="tournament[maxPlayers]" class="form-control"
+                    id="maxPlayers" value="<%= tournament.maxPlayers %>" min="2" max="500"/>
+                  <div class="invalid-feedback">Min 2, max 500 players.</div>
                 </div>
                 <div class="col-md-4">
                   <label class="form-label fw-semibold">Start Date</label>
-                  <input type="datetime-local" name="tournament[startDate]" class="form-control"
+                  <input type="datetime-local" name="tournament[startDate]"
+                    class="form-control" id="startDate"
                     value="<%= new Date(tournament.startDate).toISOString().slice(0,16) %>"/>
+                  <div class="invalid-feedback">Please set a valid start date.</div>
                 </div>
                 <div class="col-md-4">
                   <label class="form-label fw-semibold">Registration Deadline</label>
-                  <input type="datetime-local" name="tournament[registrationDeadline]" class="form-control"
+                  <input type="datetime-local" name="tournament[registrationDeadline]"
+                    class="form-control" id="regDeadline"
                     value="<%= new Date(tournament.registrationDeadline).toISOString().slice(0,16) %>"/>
+                  <div class="invalid-feedback">Deadline must be before start date.</div>
                 </div>
               </div>
 
               <div class="row g-3 mb-3">
                 <div class="col-md-6">
-                  <label class="form-label fw-semibold">Room ID</label>
-                  <input type="text" name="tournament[roomId]" class="form-control" value="<%= tournament.roomId %>"/>
+                  <label class="form-label fw-semibold">
+                    Room ID
+                    <span class="text-muted fw-normal"
+                      style="font-family:'DM Sans'; font-size:0.75rem; text-transform:none; letter-spacing:0;">
+                      (visible only to accepted players)
+                    </span>
+                  </label>
+                  <input type="text" name="tournament[roomId]" class="form-control"
+                    value="<%= tournament.roomId %>"/>
                 </div>
                 <div class="col-md-6">
                   <label class="form-label fw-semibold">Room Password</label>
-                  <input type="text" name="tournament[roomPassword]" class="form-control" value="<%= tournament.roomPassword %>"/>
+                  <input type="text" name="tournament[roomPassword]" class="form-control"
+                    value="<%= tournament.roomPassword %>"/>
                 </div>
               </div>
 
               <div class="mb-4">
                 <label class="form-label fw-semibold">Status</label>
                 <select name="tournament[status]" class="form-select">
-                  <option value="upcoming" <%= tournament.status === 'upcoming' ? 'selected' : '' %>>Upcoming</option>
-                  <option value="ongoing" <%= tournament.status === 'ongoing' ? 'selected' : '' %>>Ongoing</option>
+                  <option value="upcoming"  <%= tournament.status === 'upcoming'  ? 'selected' : '' %>>Upcoming</option>
+                  <option value="ongoing"   <%= tournament.status === 'ongoing'   ? 'selected' : '' %>>Ongoing</option>
                   <option value="completed" <%= tournament.status === 'completed' ? 'selected' : '' %>>Completed</option>
                 </select>
               </div>
 
               <div class="d-flex gap-2">
-                <button class="btn btn-warning fw-bold px-4">
+                <button type="submit" class="btn btn-warning fw-bold px-4">
                   <i class="bi bi-save"></i> Save Changes
                 </button>
                 <a href="/tournaments/<%= tournament._id %>" class="btn btn-outline-secondary">Cancel</a>
               </div>
+
             </form>
           </div>
         </div>
       </div>
     </div>
   </div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const rulesContainer = document.getElementById("rulesContainer");
+    const addRuleBtn     = document.getElementById("addRuleBtn");
+
+    function updateRuleNumbers() {
+      const items = rulesContainer.querySelectorAll(".rule-item");
+      items.forEach((item, i) => {
+        item.querySelector(".rule-number").textContent = String(i + 1).padStart(2, "0") + ".";
+        item.querySelector(".remove-rule").style.display = items.length > 1 ? "inline-block" : "none";
+      });
+    }
+
+    function focusLastRule() {
+      const inputs = rulesContainer.querySelectorAll(".rule-input");
+      inputs[inputs.length - 1].focus();
+    }
+
+    function addRule(value = "") {
+      const div = document.createElement("div");
+      div.className = "rule-item d-flex gap-2 mb-2";
+      div.innerHTML = `
+        <span class="rule-number cyber-tag-line pt-2">01.</span>
+        <input type="text" class="form-control rule-input" placeholder="Add a rule..." value="${value}"/>
+        <button type="button" class="btn btn-outline-danger btn-sm remove-rule">
+          <i class="bi bi-x"></i>
+        </button>
+      `;
+      div.querySelector(".remove-rule").addEventListener("click", () => {
+        div.remove(); updateRuleNumbers();
+      });
+      div.querySelector(".rule-input").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") { e.preventDefault(); addRule(); focusLastRule(); }
+      });
+      rulesContainer.appendChild(div);
+      updateRuleNumbers();
+    }
+
+    addRuleBtn.addEventListener("click", () => { addRule(); focusLastRule(); });
+
+    // Wire up existing rule items loaded from DB
+    rulesContainer.querySelectorAll(".rule-item").forEach(item => {
+      item.querySelector(".remove-rule").addEventListener("click", () => {
+        item.remove(); updateRuleNumbers();
+      });
+      item.querySelector(".rule-input").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") { e.preventDefault(); addRule(); focusLastRule(); }
+      });
+    });
+    updateRuleNumbers();
+
+    // ── VALIDATION ──
+    const form = document.getElementById("editForm");
+
+    function setError(el, msg) {
+      el.classList.add("is-invalid");
+      el.classList.remove("is-valid");
+      const fb = el.nextElementSibling;
+      if (fb && fb.classList.contains("invalid-feedback") && msg) fb.textContent = msg;
+    }
+    function setOk(el) {
+      el.classList.remove("is-invalid");
+      el.classList.add("is-valid");
+    }
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      let valid = true;
+
+      const title = document.getElementById("title");
+      if (title.value.trim().length >= 3) setOk(title);
+      else { setError(title, "Title must be at least 3 characters."); valid = false; }
+
+      const game = document.getElementById("game");
+      if (game.value.trim()) setOk(game);
+      else { setError(game, "Please enter the game name."); valid = false; }
+
+      const mode = document.getElementById("mode");
+      if (mode.value) setOk(mode);
+      else { setError(mode, "Please select a mode."); valid = false; }
+
+      const desc = document.getElementById("description");
+      if (desc.value.trim().length >= 10) setOk(desc);
+      else { setError(desc, "Description must be at least 10 characters."); valid = false; }
+
+      const maxP  = document.getElementById("maxPlayers");
+      const maxPV = parseInt(maxP.value);
+      if (maxPV >= 2 && maxPV <= 500) setOk(maxP);
+      else { setError(maxP, "Min 2, max 500 players."); valid = false; }
+
+      const fee = document.getElementById("entryFee");
+      if (parseInt(fee.value) >= 0) setOk(fee);
+      else { setError(fee, "Entry fee cannot be negative."); valid = false; }
+
+      const startDate   = document.getElementById("startDate");
+      const regDeadline = document.getElementById("regDeadline");
+      const startVal    = new Date(startDate.value);
+      const regVal      = new Date(regDeadline.value);
+
+      if (!startDate.value) {
+        setError(startDate, "Please set a valid start date."); valid = false;
+      } else setOk(startDate);
+
+      if (!regDeadline.value) {
+        setError(regDeadline, "Please set a registration deadline."); valid = false;
+      } else if (startDate.value && regVal >= startVal) {
+        setError(regDeadline, "Deadline must be before the start date."); valid = false;
+      } else setOk(regDeadline);
+
+      const ruleInputs = rulesContainer.querySelectorAll(".rule-input");
+      const rulesArray = Array.from(ruleInputs).map(i => i.value.trim()).filter(v => v);
+      const rulesError = document.getElementById("rulesError");
+      if (rulesArray.length === 0) {
+        rulesError.textContent = "Add at least one rule.";
+        rulesError.style.display = "block";
+        valid = false;
+      } else {
+        rulesError.style.display = "none";
+        document.getElementById("rulesHidden").value = rulesArray
+          .map((r, i) => `${i + 1}. ${r}`).join("\n");
+      }
+
+      if (valid) form.submit();
+    });
+
+    form.querySelectorAll(".form-control, .form-select").forEach(el => {
+      el.addEventListener("input", () => el.classList.remove("is-invalid"));
+    });
+  </script>
 </body>
 </html>
