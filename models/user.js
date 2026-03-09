@@ -1,53 +1,40 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
+const passportLocalMongoose = require("passport-local-mongoose").default || require("passport-local-mongoose");
 
 const userSchema = new mongoose.Schema({
-    username: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    email: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    password: {
-        type: String,
-        required: true
-    },
-    age: {
-        type: Number,
-        required: true
-    },
-    mobile: {
-        type: String,
-        required: false
-    },
-    role: {
-        type: String,
-        enum: ["player", "organiser", "admin"],
-        default: "player"
-    },
-    isBlocked: {
-        type: Boolean,
-        default: false
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    }
-});
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+    trim: true
+  },
+  role: {
+    type: String,
+    enum: ["player", "organiser"],
+    default: "player"
+  },
+  gameUsername: {
+    type: String,
+    trim: true,
+    default: ""
+  },
+  bio: {
+    type: String,
+    maxlength: 300,
+    default: ""
+  },
+  tournamentsJoined: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Tournament"
+  }],
+  tournamentsOrganised: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Tournament"
+  }]
+}, { timestamps: true });
 
-// Hash password before saving
-userSchema.pre("save", async function() {
-    if (!this.isModified("password")) return;
-    this.password = await bcrypt.hash(this.password, 10);
-});
-
-// Compare password method
-userSchema.methods.comparePassword = async function(candidatePassword) {
-    return await bcrypt.compare(candidatePassword, this.password);
-};
+// Adds username, hash, salt fields + Passport methods
+userSchema.plugin(passportLocalMongoose);
 
 module.exports = mongoose.model("User", userSchema);

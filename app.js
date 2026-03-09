@@ -1,61 +1,79 @@
-const express = require("express") ;
-const app = express() ;
+require("dotenv").config();
+const express = require("express");
 const mongoose = require("mongoose");
-const path = require("path")
-const methodOverride = require("method-override") ;
-const ejsMate = require("ejs-mate") ;
-const Tournament = require("./models/tournament.js") ;
+const path = require("path");
+const methodOverride = require("method-override");
 const session = require("express-session");
 const flash = require("connect-flash");
 const passport = require("passport");
-const LocalStrategy = require("passport-local").Strategy;
 
-const MONGO_URL = "mongodb://127.0.0.1:27017/battlearena" ;
-main()
-  .then( (res) => {
-    console.log("connected to our db battlearena") ;
-  })
-  .catch( (err) => {
-    console.log(err) ;
-  });
-  
-async function main() {
-    await mongoose.connect(MONGO_URL) ;
-}
+const authRoutes = require("./routes/auth");
+const tournamentRoutes = require("./routes/tournament");
+const applicationRoutes = require("./routes/application");
+const profileRoutes = require("./routes/profile");
 
-app.set("view engine" , "ejs" ) ;
-app.set("views" , path.join( __dirname , "views" ));
-app.use( express.urlencoded( {extended : true} ) ) ; // to parse data from route
-app.use(methodOverride("_method")) ;
-app.engine( "ejs" , ejsMate) ;
-app.use(express.static(path.join(__dirname,"/public"))) ;
+const app = express();
 
-// Session & Flash
+// DB Connection
+mongoose.connect(process.env.MONGO_URL)
+  .then(() => console.log("✅ MongoDB Connected"))
+  .catch(err => console.log("❌ DB Error:", err));
+
+// View Engine
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+
+// Middleware
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(methodOverride("_method"));
+app.use(express.static(path.join(__dirname, "public")));
+
+// Session
 app.use(session({
-    secret: "battle-arena-secret-key",
-    resave: false,
-    saveUninitialized: false
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 } // 7 days
 }));
-app.use(flash());
 
-// Passport Configuration
+// Passport
 app.use(passport.initialize());
 app.use(passport.session());
 
-const User = require("./models/user.js");
+const User = require("./models/user");
+passport.use(User.createStrategy());
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
-// Make user available in all templates
+// Flash
+app.use(flash());
+
+// Global locals — available in every EJS template
 app.use((req, res, next) => {
-    res.locals.currentUser = req.user || null;
-    res.locals.success = req.flash("success");
-    res.locals.error = req.flash("error");
-    next();
+  res.locals.currUser = req.user || null;
+  res.locals.success = req.flash("success");
+  res.locals.error = req.flash("error");
+  next();
 });
 
-// All routes from routes/index.js will be prefixed with "/"
-const indexRoutes = require("./routes/index.js");
-app.use(indexRoutes);
+// Routes
+app.use("/", authRoutes);
+app.use("/tournaments", tournamentRoutes);
+app.use("/tournaments", applicationRoutes);
+app.use("/profile", profileRoutes);
 
-app.listen( 8080 , () => {
-    console.log(" server is listening.. ") ;
-}) ;
+// 404
+app.use((req, res) => {
+  res.status(404).send("<h1>404 - Page Not Found</h1><a href='/tournaments'>Go Back</a>");
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  const { status = 500, message = "Something went wrong" } = err;
+  res.status(status).send(`<h1>Error: ${message}</h1><a href='/tournaments'>Go Back</a>`);
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));

@@ -1,0 +1,223 @@
+{
+  "info": {
+    "name": "BattleArena API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base", "value": "http://localhost:3000" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register — Organiser",
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/register",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "username", "value": "test_organiser" },
+                { "key": "email", "value": "org@test.com" },
+                { "key": "password", "value": "test123" },
+                { "key": "role", "value": "organiser" },
+                { "key": "gameUsername", "value": "TestOrg" },
+                { "key": "bio", "value": "Test organiser account" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Register — Player",
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/register",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "username", "value": "test_player" },
+                { "key": "email", "value": "player@test.com" },
+                { "key": "password", "value": "test123" },
+                { "key": "role", "value": "player" },
+                { "key": "gameUsername", "value": "TestPlayer99" },
+                { "key": "bio", "value": "Test player account" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/login",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "username", "value": "arena_admin" },
+                { "key": "password", "value": "admin123" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/logout"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tournaments",
+      "item": [
+        {
+          "name": "Get All Tournaments",
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/tournaments"
+          }
+        },
+        {
+          "name": "Get All — Filter by Game",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base}}/tournaments?game=BGMI",
+              "query": [{ "key": "game", "value": "BGMI" }]
+            }
+          }
+        },
+        {
+          "name": "Get All — Filter by Status",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base}}/tournaments?status=upcoming",
+              "query": [{ "key": "status", "value": "upcoming" }]
+            }
+          }
+        },
+        {
+          "name": "Create Tournament",
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/tournaments",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "tournament[title]", "value": "Postman Test Cup" },
+                { "key": "tournament[game]", "value": "BGMI" },
+                { "key": "tournament[description]", "value": "Created via Postman" },
+                { "key": "tournament[mode]", "value": "Solo" },
+                { "key": "tournament[prizePool]", "value": "₹1,000" },
+                { "key": "tournament[entryFee]", "value": "0" },
+                { "key": "tournament[maxPlayers]", "value": "50" },
+                { "key": "tournament[startDate]", "value": "2026-04-01T18:00" },
+                { "key": "tournament[registrationDeadline]", "value": "2026-03-30T18:00" },
+                { "key": "tournament[rules]", "value": "Fair play only" },
+                { "key": "tournament[roomId]", "value": "TEST_ROOM" },
+                { "key": "tournament[roomPassword]", "value": "test@pass" },
+                { "key": "tournament[status]", "value": "upcoming" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Tournament by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/tournaments/REPLACE_WITH_ID"
+          }
+        },
+        {
+          "name": "Update Tournament",
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/tournaments/REPLACE_WITH_ID?_method=PUT",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "tournament[title]", "value": "Updated Title" },
+                { "key": "tournament[status]", "value": "ongoing" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Tournament",
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/tournaments/REPLACE_WITH_ID?_method=DELETE"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Applications",
+      "item": [
+        {
+          "name": "Apply to Tournament",
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/tournaments/REPLACE_WITH_TOURNAMENT_ID/apply"
+          }
+        },
+        {
+          "name": "Accept Applicant",
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/tournaments/REPLACE_WITH_TOURNAMENT_ID/applicants/REPLACE_WITH_USER_ID/accept?_method=PATCH"
+          }
+        },
+        {
+          "name": "Reject Applicant",
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/tournaments/REPLACE_WITH_TOURNAMENT_ID/applicants/REPLACE_WITH_USER_ID/reject?_method=PATCH"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile",
+      "item": [
+        {
+          "name": "My Profile",
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/profile"
+          }
+        },
+        {
+          "name": "Edit Profile",
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/profile/edit?_method=PUT",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "gameUsername", "value": "UpdatedIGN" },
+                { "key": "bio", "value": "Updated bio via Postman" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "View Player Profile",
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/profile/REPLACE_WITH_USER_ID"
+          }
+        }
+      ]
+    }
+  ]
+}

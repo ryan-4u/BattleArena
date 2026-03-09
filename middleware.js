@@ -1,0 +1,39 @@
+const Tournament = require("./models/tournament");
+
+module.exports.isLoggedIn = (req, res, next) => {
+  if (!req.isAuthenticated()) {
+    req.flash("error", "You must be logged in to do that.");
+    return res.redirect("/login");
+  }
+  next();
+};
+
+module.exports.isOrganiser = (req, res, next) => {
+  if (!req.user || req.user.role !== "organiser") {
+    req.flash("error", "Only organisers can do that.");
+    return res.redirect("/tournaments");
+  }
+  next();
+};
+
+module.exports.isPlayer = (req, res, next) => {
+  if (!req.user || req.user.role !== "player") {
+    req.flash("error", "Only players can apply to tournaments.");
+    return res.redirect("back");
+  }
+  next();
+};
+
+module.exports.isTournamentOwner = async (req, res, next) => {
+  const { id } = req.params;
+  const tournament = await Tournament.findById(id);
+  if (!tournament) {
+    req.flash("error", "Tournament not found.");
+    return res.redirect("/tournaments");
+  }
+  if (!tournament.organiser.equals(req.user._id)) {
+    req.flash("error", "You are not the organiser of this tournament.");
+    return res.redirect(`/tournaments/${id}`);
+  }
+  next();
+};
