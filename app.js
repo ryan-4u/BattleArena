@@ -67,14 +67,14 @@ app.use("/profile", profileRoutes);
 
 // 404
 app.use((req, res) => {
-  res.status(404).send("<h1>404 - Page Not Found</h1><a href='/tournaments'>Go Back</a>");
+  res.status(404).render("errors/404");
 });
 
 // Global error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  const { status = 500, message = "Something went wrong" } = err;
-  res.status(status).send(`<h1>Error: ${message}</h1><a href='/tournaments'>Go Back</a>`);
+  const { status = 500, message = "Something went wrong." } = err;
+  res.status(status).render("errors/error", { message });
 });
 
 const PORT = process.env.PORT || 3000;

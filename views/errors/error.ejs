@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head') %>
+  <title>Error | BattleArena</title>
+  <link rel="stylesheet" href="/css/errors.css"/>
+</head>
+<body class="ba-bg">
+  <div class="error-page">
+    <div class="error-content">
+      <span class="error-icon"><i class="bi bi-exclamation-triangle-fill"></i></span>
+      <h1 class="error-title">SYSTEM ERROR</h1>
+      <div class="error-code-label">// SOMETHING WENT WRONG</div>
+
+      <div class="error-box">
+        <div class="error-box-label">ERROR MESSAGE</div>
+        <p class="error-box-message">
+          <%= message || "An unexpected error occurred. Please try again." %>
+        </p>
+      </div>
+
+      <div class="d-flex gap-3 justify-content-center flex-wrap">
+        <a href="/" class="btn-error">BACK TO HOME</a>
+        <a href="/tournaments" class="btn-error-secondary">VIEW TOURNAMENTS</a>
+      </div>
+    </div>
+  </div>
+  <%- include('../partials/scripts') %>
+</body>
+</html>

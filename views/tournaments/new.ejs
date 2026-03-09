@@ -1,12 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <%- include('../partials/head') %>
   <title>Create Tournament | BattleArena</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
-  <link rel="stylesheet" href="/css/style.css"/>
 </head>
 <body class="ba-bg">
   <%- include('../partials/navbar') %>
@@ -148,131 +144,7 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    const rulesContainer = document.getElementById("rulesContainer");
-    const addRuleBtn     = document.getElementById("addRuleBtn");
-
-    function updateRuleNumbers() {
-      const items = rulesContainer.querySelectorAll(".rule-item");
-      items.forEach((item, i) => {
-        item.querySelector(".rule-number").textContent = String(i + 1).padStart(2, "0") + ".";
-        item.querySelector(".remove-rule").style.display = items.length > 1 ? "inline-block" : "none";
-      });
-    }
-
-    function focusLastRule() {
-      const inputs = rulesContainer.querySelectorAll(".rule-input");
-      inputs[inputs.length - 1].focus();
-    }
-
-    function addRule(value = "") {
-      const div = document.createElement("div");
-      div.className = "rule-item d-flex gap-2 mb-2";
-      div.innerHTML = `
-        <span class="rule-number cyber-tag-line pt-2">01.</span>
-        <input type="text" class="form-control rule-input" placeholder="Add a rule..." value="${value}"/>
-        <button type="button" class="btn btn-outline-danger btn-sm remove-rule">
-          <i class="bi bi-x"></i>
-        </button>
-      `;
-      div.querySelector(".remove-rule").addEventListener("click", () => {
-        div.remove(); updateRuleNumbers();
-      });
-      div.querySelector(".rule-input").addEventListener("keydown", (e) => {
-        if (e.key === "Enter") { e.preventDefault(); addRule(); focusLastRule(); }
-      });
-      rulesContainer.appendChild(div);
-      updateRuleNumbers();
-    }
-
-    addRuleBtn.addEventListener("click", () => { addRule(); focusLastRule(); });
-
-    rulesContainer.querySelector(".remove-rule").addEventListener("click", function () {
-      this.closest(".rule-item").remove(); updateRuleNumbers();
-    });
-    rulesContainer.querySelector(".rule-input").addEventListener("keydown", (e) => {
-      if (e.key === "Enter") { e.preventDefault(); addRule(); focusLastRule(); }
-    });
-    updateRuleNumbers();
-
-    // ── VALIDATION ──
-    const form = document.getElementById("tournamentForm");
-
-    function setError(el, msg) {
-      el.classList.add("is-invalid");
-      el.classList.remove("is-valid");
-      const fb = el.nextElementSibling;
-      if (fb && fb.classList.contains("invalid-feedback") && msg) fb.textContent = msg;
-    }
-    function setOk(el) {
-      el.classList.remove("is-invalid");
-      el.classList.add("is-valid");
-    }
-
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
-      let valid = true;
-      const now = new Date();
-
-      const title = document.getElementById("title");
-      if (title.value.trim().length >= 3) setOk(title);
-      else { setError(title, "Title must be at least 3 characters."); valid = false; }
-
-      const game = document.getElementById("game");
-      if (game.value.trim()) setOk(game);
-      else { setError(game, "Please enter the game name."); valid = false; }
-
-      const mode = document.getElementById("mode");
-      if (mode.value) setOk(mode);
-      else { setError(mode, "Please select a mode."); valid = false; }
-
-      const desc = document.getElementById("description");
-      if (desc.value.trim().length >= 10) setOk(desc);
-      else { setError(desc, "Description must be at least 10 characters."); valid = false; }
-
-      const maxP = document.getElementById("maxPlayers");
-      const maxPV = parseInt(maxP.value);
-      if (maxPV >= 2 && maxPV <= 500) setOk(maxP);
-      else { setError(maxP, "Min 2, max 500 players."); valid = false; }
-
-      const fee = document.getElementById("entryFee");
-      if (parseInt(fee.value) >= 0) setOk(fee);
-      else { setError(fee, "Entry fee cannot be negative."); valid = false; }
-
-      const startDate = document.getElementById("startDate");
-      const startVal  = new Date(startDate.value);
-      if (!startDate.value || startVal <= now) {
-        setError(startDate, "Start date must be in the future."); valid = false;
-      } else setOk(startDate);
-
-      const regDeadline = document.getElementById("regDeadline");
-      const regVal      = new Date(regDeadline.value);
-      if (!regDeadline.value || regVal <= now) {
-        setError(regDeadline, "Deadline must be in the future."); valid = false;
-      } else if (startDate.value && regVal >= startVal) {
-        setError(regDeadline, "Deadline must be before the start date."); valid = false;
-      } else setOk(regDeadline);
-
-      const ruleInputs = rulesContainer.querySelectorAll(".rule-input");
-      const rulesArray = Array.from(ruleInputs).map(i => i.value.trim()).filter(v => v);
-      const rulesError = document.getElementById("rulesError");
-      if (rulesArray.length === 0) {
-        rulesError.textContent = "Add at least one rule.";
-        rulesError.style.display = "block";
-        valid = false;
-      } else {
-        rulesError.style.display = "none";
-        document.getElementById("rulesHidden").value = rulesArray
-          .map((r, i) => `${i + 1}. ${r}`).join("\n");
-      }
-
-      if (valid) form.submit();
-    });
-
-    form.querySelectorAll(".form-control, .form-select").forEach(el => {
-      el.addEventListener("input", () => el.classList.remove("is-invalid"));
-    });
-  </script>
+  <%- include('../partials/scripts') %>
+  <script src="/js/tournament-form.js"></script>
 </body>
 </html>

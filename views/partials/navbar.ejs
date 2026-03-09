@@ -1,5 +1,5 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-4">
-  <a class="navbar-brand fw-bold" href="/tournaments">
+  <a class="navbar-brand fw-bold" href="/">
     ⬡ BATTLE<span style="color:#fff; font-weight:400">ARENA</span>
   </a>
   <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
@@ -11,7 +11,7 @@
         <a class="nav-link" href="/tournaments">Tournaments</a>
       </li>
       <% if (currUser) { %>
-        <% if (currUser.role === "organiser") { %>
+        <% if (currUser.role === "organiser" || currUser.role === "admin") { %>
           <li class="nav-item">
             <a class="btn btn-warning btn-sm" href="/tournaments/new">
               <i class="bi bi-plus-lg"></i> Create Tournament
@@ -37,3 +37,4 @@
     </ul>
   </div>
 </nav>
+<script src="/js/main.js"></script>

@@ -1,37 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Account Banned | BattleArena</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="/css/style.css"/>
+  <%- include('../partials/head') %>
+  <title>Register | BattleArena</title>
 </head>
 <body class="ba-bg">
-  <div class="container d-flex align-items-center justify-content-center" style="min-height:100vh;">
-    <div class="text-center" style="max-width:480px;">
-      <div style="font-family:'Orbitron',monospace; font-size:5rem; font-weight:900; color:#ef4444; line-height:1; text-shadow: 0 0 40px rgba(239,68,68,0.4);">
-        BAN
+  <%- include('../partials/navbar') %>
+  <div class="container my-5">
+    <%- include('../partials/flash') %>
+    <div class="row justify-content-center">
+      <div class="col-md-5">
+        <div class="card shadow border-0 ba-card">
+          <div class="card-body p-4">
+            <h3 class="mb-4 fw-bold text-center">
+              <i class="bi bi-controller text-warning"></i> Join BattleArena
+            </h3>
+            <form action="/register" method="POST">
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Username</label>
+                <input type="text" name="username" class="form-control" placeholder="e.g. ProSniper99" required/>
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Email</label>
+                <input type="email" name="email" class="form-control" required/>
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Password</label>
+                <input type="password" name="password" class="form-control" required/>
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">I am a...</label>
+                <select name="role" class="form-select" required>
+                  <option value="player">🎮 Player — I want to join tournaments</option>
+                  <option value="organiser">🏆 Organiser — I want to host tournaments</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">In-Game Username <span class="text-muted fw-normal">(optional)</span></label>
+                <input type="text" name="gameUsername" class="form-control" placeholder="Your IGN"/>
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Bio <span class="text-muted fw-normal">(optional)</span></label>
+                <textarea name="bio" class="form-control" rows="2" maxlength="300" placeholder="Tell others about yourself..."></textarea>
+              </div>
+              <button class="btn btn-warning w-100 fw-bold py-2">Create Account</button>
+            </form>
+            <p class="text-center mt-3 mb-0 text-muted">
+              Already have an account? <a href="/login" class="text-warning">Login</a>
+            </p>
+          </div>
+        </div>
       </div>
-      <div style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:#ef4444; letter-spacing:0.3em; margin: 10px 0 24px;">
-        // ACCOUNT SUSPENDED
-      </div>
-      <div style="border:1px solid rgba(239,68,68,0.3); padding:24px; margin-bottom:28px; background:rgba(239,68,68,0.04);">
-        <p style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:#ef4444; letter-spacing:0.2em; margin-bottom:10px;">
-          REASON
-        </p>
-        <p style="color:#94a3b8; font-size:0.9rem; margin:0;">
-          <%= decodeURIComponent(query && query.reason ? query.reason : 'Violation of platform rules.') %>
-        </p>
-      </div>
-      <p style="font-size:0.8rem; color:#475569; margin-bottom:24px;">
-        Your account has been suspended by a BattleArena admin. If you believe this is a mistake, contact support.
-      </p>
-      <a href="/" style="font-family:'Share Tech Mono',monospace; font-size:0.68rem; color:var(--cyber-blue); border:1px solid rgba(56,189,248,0.3); padding:10px 24px; text-decoration:none; letter-spacing:0.12em; display:inline-block; transition:all 0.2s;">
-        BACK TO HOME
-      </a>
     </div>
   </div>
+  <%- include('../partials/scripts') %>
 </body>
 </html>

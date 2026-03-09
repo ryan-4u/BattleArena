@@ -15,7 +15,7 @@ module.exports.isLoggedIn = (req, res, next) => {
 };
 
 module.exports.isOrganiser = (req, res, next) => {
-  if (!req.user || req.user.role !== "organiser") {
+  if (!req.user || (req.user.role !== "organiser" && req.user.role !== "admin")) {
     req.flash("error", "Only organisers can do that.");
     return res.redirect("/tournaments");
   }
