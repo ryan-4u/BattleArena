@@ -6,12 +6,40 @@ const { isLoggedIn, isOrganiser, isTournamentOwner } = require("../middleware");
 // INDEX
 router.get("/", async (req, res) => {
   const { search, game, status } = req.query;
-  let filter = { blocked: false }; // hide blocked tournaments
+  
+  let filter = { blocked: false };
   if (search) filter.title = { $regex: search, $options: "i" };
   if (game)   filter.game  = { $regex: game,   $options: "i" };
   if (status) filter.status = status;
 
-  const tournaments = await Tournament.find(filter).populate("organiser").sort({ createdAt: -1 });
+  const tournaments = await Tournament.aggregate([
+    { $match: filter },
+    {
+      $addFields: {
+        statusOrder: {
+          $switch: {
+            branches: [
+              { case: { $eq: ["$status", "ongoing"]   }, then: 1 },
+              { case: { $eq: ["$status", "upcoming"]  }, then: 2 },
+              { case: { $eq: ["$status", "completed"] }, then: 3 },
+            ],
+            default: 4
+          }
+        }
+      }
+    },
+    { $sort: { statusOrder: 1, startDate: 1 } },
+    {
+      $lookup: {
+        from: "users",
+        localField: "organiser",
+        foreignField: "_id",
+        as: "organiser"
+      }
+    },
+    { $unwind: "$organiser" }
+  ]);
+
   res.render("tournaments/index", { tournaments, query: req.query });
 });
 
