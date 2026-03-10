@@ -57,13 +57,16 @@ module.exports.autoUpdateTournamentStatus = async (req, res, next) => {
     const Tournament = require("./models/tournament");
     const now = new Date();
 
+    // upcoming → ongoing when startDate passes
     await Tournament.updateMany(
       { status: "upcoming", startDate: { $lte: now } },
       { $set: { status: "ongoing" } }
     );
 
+    // ongoing → completed only after startDate + 7 days
+    // (gives organiser time to run the tournament)
     await Tournament.updateMany(
-      { status: "ongoing", registrationDeadline: { $lte: now }, startDate: { $lte: now } },
+      { status: "ongoing", startDate: { $lte: new Date(now - 7 * 24 * 60 * 60 * 1000) } },
       { $set: { status: "completed" } }
     );
   } catch (err) {
