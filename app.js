@@ -1,4 +1,6 @@
-require("dotenv").config();
+if (process.env.NODE_ENV != "production") {
+  require("dotenv").config();
+}
 const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
@@ -18,9 +20,11 @@ const adminRoutes = require("./routes/admin");
 const app = express();
 
 // DB Connection
-mongoose.connect(process.env.MONGO_URL)
-  .then(() => console.log("✅ MongoDB Connected"))
-  .catch(err => console.log("❌ DB Error:", err));
+const dbUrl = process.env.MONGO_URL || "mongodb://127.0.0.1:27017/battlearena";
+
+mongoose.connect(dbUrl)
+  .then(() => console.log("Connected to BattleArena DB"))
+  .catch(err => console.log(err));
 
 // View Engine
 app.set("view engine", "ejs");
@@ -33,12 +37,34 @@ app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
 
 // Session
-app.use(session({
+
+const MongoStore = require("connect-mongo");
+
+const store = MongoStore.create({
+  mongoUrl: dbUrl,
+  crypto: {
+    secret: process.env.SESSION_SECRET
+  },
+  touchAfter: 24 * 3600
+});
+
+store.on("error", (err) => {
+  console.log("Session store error", err);
+});
+
+const sessionOptions = {
+  store,
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 } // 7 days
-}));
+  cookie: {
+    expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: true
+  }
+};
+
+app.use(session(sessionOptions));
 
 // Passport
 app.use(passport.initialize());
