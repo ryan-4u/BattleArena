@@ -47,7 +47,16 @@ const tournamentSchema = new mongoose.Schema({
   roomId: { type: String, default: "" },
   roomPassword: { type: String, default: "" } ,
   blocked:      { type: Boolean, default: false },
-  blockedReason:{ type: String, default: "" }
+  blockedReason:{ type: String, default: "" },
+  winner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    default: null
+  },
+  winnerDeclaredAt: {
+    type: Date,
+    default: null
+  }
 }, { timestamps: true });
 
 module.exports = mongoose.model("Tournament", tournamentSchema);

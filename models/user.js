@@ -19,7 +19,8 @@ const userSchema = new mongoose.Schema({
   banned:       { type: Boolean, default: false },
   banReason:    { type: String, default: "" },
   tournamentsJoined:    [{ type: mongoose.Schema.Types.ObjectId, ref: "Tournament" }],
-  tournamentsOrganised: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tournament" }]
+  tournamentsOrganised: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tournament" }],
+  tournamentsWon: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tournament" }]
 }, { timestamps: true });
 
 userSchema.plugin(passportLocalMongoose);

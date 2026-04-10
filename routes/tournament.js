@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const User = require("../models/user");
 const Tournament = require("../models/tournament");
 const { isLoggedIn, isOrganiser, isTournamentOwner } = require("../middleware");
 
@@ -67,7 +68,8 @@ router.post("/", isLoggedIn, isOrganiser, async (req, res) => {
 router.get("/:id", async (req, res) => {
   const tournament = await Tournament.findById(req.params.id)
     .populate("organiser")
-    .populate("applicants.player");
+    .populate("applicants.player")
+    .populate("winner");
 
   if (!tournament) {
     req.flash("error", "Tournament not found.");
@@ -130,6 +132,56 @@ router.patch("/:id/room", isLoggedIn, isOrganiser, isTournamentOwner, async (req
   });
 
   req.flash("success", "Room details updated. Accepted players can now see them.");
+  res.redirect(`/tournaments/${req.params.id}`);
+});
+
+// Declare winner — organiser only, ongoing tournaments
+router.patch("/:id/declare-winner", isLoggedIn, isOrganiser, isTournamentOwner, async (req, res) => {
+  const { winnerId } = req.body;
+
+  if (!winnerId) {
+    req.flash("error", "Please select a winner.");
+    return res.redirect(`/tournaments/${req.params.id}`);
+  }
+
+  const tournament = await Tournament.findById(req.params.id);
+
+  if (!tournament) {
+    req.flash("error", "Tournament not found.");
+    return res.redirect("/tournaments");
+  }
+
+  if (tournament.status === "completed") {
+    req.flash("error", "Winner has already been declared.");
+    return res.redirect(`/tournaments/${req.params.id}`);
+  }
+
+  const isAcceptedPlayer = tournament.applicants.some(
+    a => a.player.equals(winnerId) && a.status === "accepted"
+  );
+
+  if (!isAcceptedPlayer) {
+    req.flash("error", "Selected winner must be an accepted participant.");
+    return res.redirect(`/tournaments/${req.params.id}`);
+  }
+
+  const updated = await Tournament.findByIdAndUpdate(
+    req.params.id,
+    {
+      $set: {
+        winner: winnerId,
+        winnerDeclaredAt: new Date(),
+        status: "completed"
+      }
+    },
+    { new: true }
+  );
+
+  await User.findByIdAndUpdate(winnerId, {
+    $addToSet: { tournamentsWon: tournament._id }
+  });
+
+  req.flash("success", "Winner declared! Tournament is now completed.");
   res.redirect(`/tournaments/${req.params.id}`);
 });
 

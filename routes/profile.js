@@ -7,7 +7,8 @@ const { isLoggedIn } = require("../middleware");
 router.get("/", isLoggedIn, async (req, res) => {
   const user = await User.findById(req.user._id)
     .populate("tournamentsJoined")
-    .populate("tournamentsOrganised");
+    .populate("tournamentsOrganised")
+    .populate("tournamentsWon");
   res.render("profile/show", { profileUser: user, isOwn: true });
 });
 
@@ -28,7 +29,8 @@ router.put("/edit", isLoggedIn, async (req, res) => {
 router.get("/:id", isLoggedIn, async (req, res) => {
   const user = await User.findById(req.params.id)
     .populate("tournamentsJoined")
-    .populate("tournamentsOrganised");
+    .populate("tournamentsOrganised")
+    .populate("tournamentsWon");
   if (!user) {
     req.flash("error", "User not found.");
     return res.redirect("/tournaments");

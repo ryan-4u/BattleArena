@@ -8,6 +8,29 @@
   <%- include('../partials/navbar') %>
   <div class="container my-5">
     <%- include('../partials/flash') %>
+    <!-- Winner Banner — shown to everyone when tournament is completed -->
+    <% if (tournament.status === 'completed' && tournament.winner) { %>
+      <div class="mb-4" style="border:1px solid rgba(250,204,21,0.4); background:rgba(250,204,21,0.04); padding:24px; position:relative;">
+        <div style="position:absolute; top:0; left:0; width:50px; height:2px; background:#facc15;"></div>
+        <div style="position:absolute; top:0; right:0; width:50px; height:2px; background:#facc15;"></div>
+        <p style="font-family:'Share Tech Mono',monospace; font-size:0.62rem; color:#facc15; letter-spacing:0.3em; margin-bottom:10px;">
+          🏆 TOURNAMENT CHAMPION
+        </p>
+        <div class="d-flex align-items-center gap-3">
+          <div style="width:52px; height:52px; border-radius:50%; background:rgba(250,204,21,0.15); border:2px solid #facc15; display:flex; align-items:center; justify-content:center; font-family:'Orbitron',monospace; font-size:1.3rem; font-weight:900; color:#facc15;">
+            <%= tournament.winner.username.charAt(0).toUpperCase() %>
+          </div>
+          <div>
+            <a href="/profile/<%= tournament.winner._id %>" style="font-family:'Orbitron',monospace; font-size:1.1rem; font-weight:900; color:#facc15; text-decoration:none; letter-spacing:0.08em;">
+              <%= tournament.winner.username %>
+            </a>
+            <div style="font-family:'Share Tech Mono',monospace; font-size:0.62rem; color:#78716c; letter-spacing:0.15em; margin-top:3px;">
+              DECLARED WINNER · <%= new Date(tournament.winnerDeclaredAt).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% } %>
     <!-- Blocked warning — visible to organiser and admin only -->
     <% if (tournament.blocked) { %>
       <div class="alert mb-4" style="background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.4); border-left-width:4px; border-radius:0;">
@@ -234,6 +257,51 @@
 
             </div>
           </div>
+          <!-- Declare Winner — organiser only, ongoing tournament with accepted players -->
+          <% if (tournament.status === 'ongoing') { %>
+            <%
+              const acceptedPlayers = tournament.applicants.filter(a => a.status === 'accepted');
+            %>
+            <% if (acceptedPlayers.length > 0) { %>
+              <div class="card ba-card mb-4" style="border-color:rgba(250,204,21,0.25);">
+                <div class="card-body p-4">
+                  <p style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:#facc15; letter-spacing:0.2em; margin-bottom:6px;">
+                    // DECLARE WINNER
+                  </p>
+                  <p style="font-size:0.78rem; color:#475569; margin-bottom:16px;">
+                    Select the winner from accepted participants. This action is permanent and cannot be undone. Tournament will be marked as completed.
+                  </p>
+                  <form action="/tournaments/<%= tournament._id %>/declare-winner?_method=PATCH" method="POST"
+                    onsubmit="return confirm('Declare this player as winner? This cannot be undone.')">
+                    <div class="row g-2">
+                      <div class="col-md-8">
+                        <select name="winnerId" class="form-select" required>
+                          <option value="">Select winner...</option>
+                          <% acceptedPlayers.forEach(app => { %>
+                            <option value="<%= app.player._id %>">
+                              <%= app.player.username %>
+                              <%= app.player.gameUsername ? '(' + app.player.gameUsername + ')' : '' %>
+                            </option>
+                          <% }) %>
+                        </select>
+                      </div>
+                      <div class="col-md-4">
+                        <button type="submit" class="btn btn-warning w-100 fw-bold">
+                          <i class="bi bi-trophy-fill"></i> Declare Winner
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            <% } else { %>
+              <div class="alert mb-4" style="background:rgba(250,204,21,0.04); border:1px solid rgba(250,204,21,0.2); border-radius:0;">
+                <p style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:#facc15; letter-spacing:0.15em; margin:0;">
+                  // Accept at least one participant before declaring a winner.
+                </p>
+              </div>
+            <% } %>
+          <% } %>
         <% } %>
 
         <!-- Apply Section -->
