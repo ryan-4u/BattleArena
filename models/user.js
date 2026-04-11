@@ -20,7 +20,12 @@ const userSchema = new mongoose.Schema({
   banReason:    { type: String, default: "" },
   tournamentsJoined:    [{ type: mongoose.Schema.Types.ObjectId, ref: "Tournament" }],
   tournamentsOrganised: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tournament" }],
-  tournamentsWon: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tournament" }]
+  tournamentsWon: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tournament" }],
+  profileReports: [{
+    reportedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    reason: { type: String, default: "" },
+    reportedAt: { type: Date, default: Date.now }
+  }]
 }, { timestamps: true });
 
 userSchema.plugin(passportLocalMongoose);

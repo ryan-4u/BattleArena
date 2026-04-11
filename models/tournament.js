@@ -56,7 +56,17 @@ const tournamentSchema = new mongoose.Schema({
   winnerDeclaredAt: {
     type: Date,
     default: null
-  }
+  },
+  resultSupports: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User"
+  }],
+  resultReports: [{
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    reason: { type: String, default: "" }
+  }]
 }, { timestamps: true });
+
+
 
 module.exports = mongoose.model("Tournament", tournamentSchema);

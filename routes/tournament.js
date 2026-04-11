@@ -87,14 +87,33 @@ router.get("/:id", async (req, res) => {
   }
 
   let isAccepted = false;
+  let hasResponded = false;
+  let userResponse = null; // 'supported' or 'reported'
+
   if (req.user) {
     const entry = tournament.applicants.find(
       a => a.player && a.player._id.equals(req.user._id) && a.status === "accepted"
     );
     isAccepted = !!entry;
+
+    if (isAccepted) {
+      const supported = tournament.resultSupports.some(
+        id => id.equals(req.user._id)
+      );
+      const reported = tournament.resultReports.some(
+        r => r.user.equals(req.user._id)
+      );
+      if (supported) { hasResponded = true; userResponse = "supported"; }
+      if (reported)  { hasResponded = true; userResponse = "reported"; }
+    }
   }
 
-  res.render("tournaments/show", { tournament, isAccepted });
+  res.render("tournaments/show", {
+    tournament,
+    isAccepted,
+    hasResponded,
+    userResponse
+  });
 });
 
 // EDIT
@@ -182,6 +201,83 @@ router.patch("/:id/declare-winner", isLoggedIn, isOrganiser, isTournamentOwner, 
   });
 
   req.flash("success", "Winner declared! Tournament is now completed.");
+  res.redirect(`/tournaments/${req.params.id}`);
+});
+
+// Support result — accepted players only
+router.post("/:id/support", isLoggedIn, async (req, res) => {
+  const tournament = await Tournament.findById(req.params.id);
+
+  if (!tournament || tournament.status !== "completed") {
+    req.flash("error", "Tournament not found or not completed.");
+    return res.redirect("/tournaments");
+  }
+
+  const isAcceptedPlayer = tournament.applicants.some(
+    a => a.player.equals(req.user._id) && a.status === "accepted"
+  );
+
+  if (!isAcceptedPlayer) {
+    req.flash("error", "Only accepted participants can support the result.");
+    return res.redirect(`/tournaments/${req.params.id}`);
+  }
+
+  const alreadySupported = tournament.resultSupports.some(
+    id => id.equals(req.user._id)
+  );
+  const alreadyReported = tournament.resultReports.some(
+    r => r.user.equals(req.user._id)
+  );
+
+  if (alreadySupported || alreadyReported) {
+    req.flash("error", "You have already responded to this result.");
+    return res.redirect(`/tournaments/${req.params.id}`);
+  }
+
+  await Tournament.findByIdAndUpdate(req.params.id, {
+    $push: { resultSupports: req.user._id }
+  });
+
+  req.flash("success", "You have supported the result.");
+  res.redirect(`/tournaments/${req.params.id}`);
+});
+
+// Report result — accepted players only
+router.post("/:id/report", isLoggedIn, async (req, res) => {
+  const { reason } = req.body;
+  const tournament = await Tournament.findById(req.params.id);
+
+  if (!tournament || tournament.status !== "completed") {
+    req.flash("error", "Tournament not found or not completed.");
+    return res.redirect("/tournaments");
+  }
+
+  const isAcceptedPlayer = tournament.applicants.some(
+    a => a.player.equals(req.user._id) && a.status === "accepted"
+  );
+
+  if (!isAcceptedPlayer) {
+    req.flash("error", "Only accepted participants can report the result.");
+    return res.redirect(`/tournaments/${req.params.id}`);
+  }
+
+  const alreadySupported = tournament.resultSupports.some(
+    id => id.equals(req.user._id)
+  );
+  const alreadyReported = tournament.resultReports.some(
+    r => r.user.equals(req.user._id)
+  );
+
+  if (alreadySupported || alreadyReported) {
+    req.flash("error", "You have already responded to this result.");
+    return res.redirect(`/tournaments/${req.params.id}`);
+  }
+
+  await Tournament.findByIdAndUpdate(req.params.id, {
+    $push: { resultReports: { user: req.user._id, reason: reason || "" } }
+  });
+
+  req.flash("success", "Result reported. Admin will review if enough reports are received.");
   res.redirect(`/tournaments/${req.params.id}`);
 });
 

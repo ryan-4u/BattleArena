@@ -38,4 +38,36 @@ router.get("/:id", isLoggedIn, async (req, res) => {
   res.render("profile/show", { profileUser: user, isOwn: false });
 });
 
+// Report a user profile
+router.post("/:id/report", isLoggedIn, async (req, res) => {
+  const { reason } = req.body;
+
+  if (req.params.id === req.user._id.toString()) {
+    req.flash("error", "You cannot report your own profile.");
+    return res.redirect(`/profile/${req.params.id}`);
+  }
+
+  const profileUser = await User.findById(req.params.id);
+  if (!profileUser) {
+    req.flash("error", "User not found.");
+    return res.redirect("/tournaments");
+  }
+
+  const alreadyReported = profileUser.profileReports.some(
+    r => r.reportedBy.equals(req.user._id)
+  );
+
+  if (alreadyReported) {
+    req.flash("error", "You have already reported this profile.");
+    return res.redirect(`/profile/${req.params.id}`);
+  }
+
+  await User.findByIdAndUpdate(req.params.id, {
+    $push: { profileReports: { reportedBy: req.user._id, reason: reason || "" } }
+  });
+
+  req.flash("success", "Profile reported. Admin will review.");
+  res.redirect(`/profile/${req.params.id}`);
+});
+
 module.exports = router;
