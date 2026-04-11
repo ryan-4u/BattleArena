@@ -12,43 +12,48 @@
       <div class="col-md-5">
         <div class="card shadow border-0 ba-card">
           <div class="card-body p-4">
-            <h3 class="mb-4 fw-bold text-center">
+            <h3 class="mb-1 fw-bold text-center">
               <i class="bi bi-controller text-warning"></i> Join BattleArena
             </h3>
+            <p class="text-center mb-4" style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:#475569; letter-spacing:0.15em;">
+              // ALL ACCOUNTS START AS PLAYER
+            </p>
             <form action="/register" method="POST" id="registerForm" novalidate>
               <div class="mb-3">
                 <label class="form-label fw-semibold">Username</label>
-                <input type="text" name="username" id="username" class="form-control" placeholder="e.g. ProSniper99" required/>
-                <div class="invalid-feedback">Username is required.</div>
+                <input type="text" name="username" id="username" class="form-control"
+                  placeholder="e.g. ProSniper99"/>
+                <div class="invalid-feedback">Username must be at least 3 characters.</div>
               </div>
               <div class="mb-3">
                 <label class="form-label fw-semibold">Email</label>
-                <input type="email" name="email" id="email" class="form-control" required/>
-                <div class="invalid-feedback">Enter a valid email address.</div>
+                <input type="email" name="email" id="email" class="form-control"
+                  placeholder="your@email.com"/>
+                <div class="invalid-feedback">Please enter a valid email address.</div>
               </div>
               <div class="mb-3">
                 <label class="form-label fw-semibold">Password</label>
-                <input type="password" name="password" id="password" class="form-control" required/>
+                <input type="password" name="password" id="password" class="form-control"
+                  placeholder="Min 6 characters"/>
                 <div class="invalid-feedback">Password must be at least 6 characters.</div>
               </div>
               <div class="mb-3">
-                <label class="form-label fw-semibold">I am a...</label>
-                <select name="role" id="role" class="form-select" required>
-                  <option value="">Select a role...</option>
-                  <option value="player">🎮 Player — I want to join tournaments</option>
-                  <option value="organiser">🏆 Organiser — I want to host tournaments</option>
-                </select>
-                <div class="invalid-feedback">Please select a role.</div>
+                <label class="form-label fw-semibold">
+                  Competitor Alias <span class="text-muted fw-normal">(optional)</span>
+                </label>
+                <input type="text" name="gameUsername" class="form-control"
+                  placeholder="Your in-game name or handle"/>
               </div>
               <div class="mb-3">
-                <label class="form-label fw-semibold">In-Game Username <span class="text-muted fw-normal">(optional)</span></label>
-                <input type="text" name="gameUsername" class="form-control" placeholder="Your IGN"/>
+                <label class="form-label fw-semibold">
+                  Bio <span class="text-muted fw-normal">(optional)</span>
+                </label>
+                <textarea name="bio" class="form-control" rows="2" maxlength="300"
+                  placeholder="Tell others about yourself..."></textarea>
               </div>
-              <div class="mb-3">
-                <label class="form-label fw-semibold">Bio <span class="text-muted fw-normal">(optional)</span></label>
-                <textarea name="bio" class="form-control" rows="2" maxlength="300" placeholder="Tell others about yourself..."></textarea>
-              </div>
-              <button class="btn btn-warning w-100 fw-bold py-2">Create Account</button>
+              <button class="btn btn-warning w-100 fw-bold py-2">
+                Continue — Verify Email
+              </button>
             </form>
             <p class="text-center mt-3 mb-0 text-muted">
               Already have an account? <a href="/login" class="text-warning">Login</a>

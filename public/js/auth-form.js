@@ -1,4 +1,4 @@
-// ── LOGIN VALIDATION ──────────────────────────
+// ── LOGIN FORM ─────────────────────────────
 const loginForm = document.getElementById("loginForm");
 if (loginForm) {
   loginForm.addEventListener("submit", function (e) {
@@ -6,26 +6,30 @@ if (loginForm) {
     let valid = true;
 
     const username = document.getElementById("username");
-    if (username.value.trim().length < 3) {
+    if (username.value.trim().length >= 3) {
+      setOk(username);
+    } else {
       setError(username, "Username must be at least 3 characters.");
       valid = false;
-    } else setOk(username);
+    }
 
     const password = document.getElementById("password");
-    if (password.value.length < 6) {
+    if (password.value.length >= 6) {
+      setOk(password);
+    } else {
       setError(password, "Password must be at least 6 characters.");
       valid = false;
-    } else setOk(password);
+    }
 
     if (valid) loginForm.submit();
   });
 
   loginForm.querySelectorAll(".form-control").forEach(el => {
-    el.addEventListener("input", () => el.classList.remove("is-invalid"));
+    el.addEventListener("input", () => el.classList.remove("is-invalid", "is-valid"));
   });
 }
 
-// ── REGISTER VALIDATION ───────────────────────
+// ── REGISTER FORM ──────────────────────────
 const registerForm = document.getElementById("registerForm");
 if (registerForm) {
   registerForm.addEventListener("submit", function (e) {
@@ -33,49 +37,44 @@ if (registerForm) {
     let valid = true;
 
     const username = document.getElementById("username");
-    if (username.value.trim().length < 3) {
+    if (username.value.trim().length >= 3) {
+      setOk(username);
+    } else {
       setError(username, "Username must be at least 3 characters.");
       valid = false;
-    } else setOk(username);
+    }
 
     const email = document.getElementById("email");
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email.value.trim())) {
-      setError(email, "Enter a valid email address.");
+    if (emailRegex.test(email.value.trim())) {
+      setOk(email);
+    } else {
+      setError(email, "Please enter a valid email address.");
       valid = false;
-    } else setOk(email);
+    }
 
     const password = document.getElementById("password");
-    if (password.value.length < 6) {
+    if (password.value.length >= 6) {
+      setOk(password);
+    } else {
       setError(password, "Password must be at least 6 characters.");
       valid = false;
-    } else setOk(password);
-
-    const role = document.getElementById("role");
-    if (!role.value) {
-      setError(role, "Please select a role.");
-      valid = false;
-    } else setOk(role);
+    }
 
     if (valid) registerForm.submit();
   });
 
-  registerForm.querySelectorAll(".form-control, .form-select").forEach(el => {
-    el.addEventListener("input", () => el.classList.remove("is-invalid"));
+  registerForm.querySelectorAll(".form-control").forEach(el => {
+    el.addEventListener("input", () => el.classList.remove("is-invalid", "is-valid"));
   });
 }
 
-// ── HELPERS ───────────────────────────────────
+// ── HELPERS ────────────────────────────────
 function setError(el, msg) {
   el.classList.add("is-invalid");
   el.classList.remove("is-valid");
-  let fb = el.nextElementSibling;
-  if (!fb || !fb.classList.contains("invalid-feedback")) {
-    fb = document.createElement("div");
-    fb.className = "invalid-feedback";
-    el.parentNode.insertBefore(fb, el.nextSibling);
-  }
-  fb.textContent = msg;
+  const fb = el.nextElementSibling;
+  if (fb && fb.classList.contains("invalid-feedback")) fb.textContent = msg;
 }
 
 function setOk(el) {
