@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head') %>
+  <title>Application Status | BattleArena</title>
+</head>
+<body class="ba-bg">
+  <%- include('../partials/navbar') %>
+  <div class="container my-5">
+    <%- include('../partials/flash') %>
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+
+        <% if (status === 'pending') { %>
+          <div class="card ba-card p-4 text-center">
+            <div style="font-size:3rem; margin-bottom:16px;">⏳</div>
+            <p class="cyber-tag-line mb-2">// APPLICATION SUBMITTED</p>
+            <h4 class="fw-bold mb-3">Under Review</h4>
+            <p style="font-size:0.85rem; color:#475569; margin-bottom:20px;">
+              Your organiser application is being reviewed by admin. You will be notified once a decision is made. This typically takes 1–3 days.
+            </p>
+            <div style="background:rgba(56,189,248,0.04); border:1px solid rgba(56,189,248,0.15); padding:16px; text-align:left; margin-bottom:20px;">
+              <p style="font-family:'Share Tech Mono',monospace; font-size:0.62rem; color:var(--cyber-blue); letter-spacing:0.2em; margin-bottom:10px;">
+                YOUR APPLICATION
+              </p>
+              <p style="font-size:0.8rem; color:#94a3b8; margin-bottom:4px;">
+                <strong style="color:#64748b;">Type:</strong> <%= application.tournamentType %>
+              </p>
+              <p style="font-size:0.8rem; color:#94a3b8; margin-bottom:4px;">
+                <strong style="color:#64748b;">Activity:</strong> <%= application.activity %>
+              </p>
+              <p style="font-size:0.8rem; color:#94a3b8; margin-bottom:0;">
+                <strong style="color:#64748b;">Applied:</strong>
+                <%= new Date(application.createdAt).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) %>
+              </p>
+            </div>
+            <a href="/tournaments" class="btn btn-outline-warning btn-sm">Browse Tournaments</a>
+          </div>
+
+        <% } else if (status === 'rejected') { %>
+          <div class="card ba-card p-4 text-center">
+            <div style="font-size:3rem; margin-bottom:16px;">❌</div>
+            <p class="cyber-tag-line mb-2" style="color:#ef4444;">// APPLICATION REJECTED</p>
+            <h4 class="fw-bold mb-3">Not Approved</h4>
+            <% if (application.rejectionReason) { %>
+              <div style="background:rgba(239,68,68,0.04); border:1px solid rgba(239,68,68,0.2); border-left:3px solid #ef4444; padding:16px; text-align:left; margin-bottom:20px;">
+                <p style="font-family:'Share Tech Mono',monospace; font-size:0.62rem; color:#ef4444; letter-spacing:0.2em; margin-bottom:8px;">
+                  REASON
+                </p>
+                <p style="font-size:0.83rem; color:#94a3b8; margin:0;">
+                  <%= application.rejectionReason %>
+                </p>
+              </div>
+            <% } %>
+            <%
+              const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+              const canReapply = !application.reviewedAt || application.reviewedAt <= thirtyDaysAgo;
+              const daysLeft = application.reviewedAt
+                ? Math.ceil((new Date(application.reviewedAt).getTime() + 30*24*60*60*1000 - Date.now()) / (1000*60*60*24))
+                : 0;
+            %>
+            <% if (canReapply) { %>
+              <a href="/become-organiser" class="btn btn-warning btn-sm fw-bold">
+                Reapply Now
+              </a>
+            <% } else { %>
+              <p style="font-size:0.8rem; color:#475569; margin-bottom:16px;">
+                You can reapply in <strong style="color:var(--cyber-blue);"><%= daysLeft %> day<%= daysLeft !== 1 ? 's' : '' %></strong>.
+              </p>
+              <a href="/tournaments" class="btn btn-outline-warning btn-sm">Browse Tournaments</a>
+            <% } %>
+          </div>
+        <% } %>
+
+      </div>
+    </div>
+  </div>
+  <%- include('../partials/scripts') %>
+</body>
+</html>

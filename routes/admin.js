@@ -2,6 +2,7 @@ const express    = require("express");
 const router     = express.Router();
 const User       = require("../models/user");
 const Tournament = require("../models/tournament");
+const OrgApplication = require("../models/orgApplication");
 const { isLoggedIn, isAdmin } = require("../middleware");
 
 // All admin routes require login + admin role
@@ -19,11 +20,13 @@ router.get("/", async (req, res) => {
     Tournament.countDocuments({ status: { $in: ["upcoming", "ongoing"] }, blocked: false }),
   ]);
   const bannedUsers = await User.countDocuments({ banned: true });
+  const pendingApplications = await OrgApplication.countDocuments({ status: "pending" });
 
   res.render("admin/dashboard", {
     stats: {
       totalUsers, totalPlayers, totalOrganisers,
-      totalTournaments, blockedTournaments, activeTournaments, bannedUsers
+      totalTournaments, blockedTournaments, activeTournaments,
+      bannedUsers, pendingApplications
     }
   });
 });
@@ -108,6 +111,64 @@ router.patch("/tournaments/:id/unblock", async (req, res) => {
   });
   req.flash("success", "Tournament unblocked.");
   res.redirect("/admin/tournaments");
+});
+
+// ── ORGANISER APPLICATIONS ──
+router.get("/organiser-applications", async (req, res) => {
+  const { status } = req.query;
+  let filter = {};
+  if (status) filter.status = status;
+
+  const applications = await OrgApplication.find(filter)
+    .populate("applicant")
+    .populate("reviewedBy")
+    .sort({ createdAt: -1 });
+
+  res.render("admin/organiser-applications", { applications, query: req.query });
+});
+
+// ── APPROVE APPLICATION ──
+router.patch("/organiser-applications/:id/approve", async (req, res) => {
+  const application = await OrgApplication.findById(req.params.id).populate("applicant");
+
+  if (!application) {
+    req.flash("error", "Application not found.");
+    return res.redirect("/admin/organiser-applications");
+  }
+
+  await OrgApplication.findByIdAndUpdate(req.params.id, {
+    status: "approved",
+    reviewedBy: req.user._id,
+    reviewedAt: new Date()
+  });
+
+  await User.findByIdAndUpdate(application.applicant._id, {
+    role: "organiser"
+  });
+
+  req.flash("success", `${application.applicant.username} is now an organiser.`);
+  res.redirect("/admin/organiser-applications");
+});
+
+// ── REJECT APPLICATION ──
+router.patch("/organiser-applications/:id/reject", async (req, res) => {
+  const { reason } = req.body;
+  const application = await OrgApplication.findById(req.params.id).populate("applicant");
+
+  if (!application) {
+    req.flash("error", "Application not found.");
+    return res.redirect("/admin/organiser-applications");
+  }
+
+  await OrgApplication.findByIdAndUpdate(req.params.id, {
+    status: "rejected",
+    rejectionReason: reason || "Application did not meet requirements.",
+    reviewedBy: req.user._id,
+    reviewedAt: new Date()
+  });
+
+  req.flash("success", `Application from ${application.applicant.username} rejected.`);
+  res.redirect("/admin/organiser-applications");
 });
 
 module.exports = router;

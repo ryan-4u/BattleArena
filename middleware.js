@@ -23,7 +23,7 @@ module.exports.isOrganiser = (req, res, next) => {
 };
 
 module.exports.isPlayer = (req, res, next) => {
-  if (!req.user || req.user.role !== "player") {
+  if (!req.user || (req.user.role !== "player" && req.user.role !== "organiser")) {
     req.flash("error", "Only players can apply to tournaments.");
     return res.redirect("back");
   }

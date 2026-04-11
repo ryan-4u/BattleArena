@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head') %>
+  <title>Become an Organiser | BattleArena</title>
+</head>
+<body class="ba-bg">
+  <%- include('../partials/navbar') %>
+  <div class="container my-5">
+    <%- include('../partials/flash') %>
+
+    <div class="row justify-content-center">
+      <div class="col-md-7">
+
+        <!-- Header -->
+        <div class="mb-4">
+          <p class="cyber-tag-line mb-1">// ORGANISER PROGRAMME</p>
+          <h2 class="fw-bold mb-1">Become an Organiser</h2>
+          <p style="font-size:0.85rem; color:#475569;">
+            Organisers can create and manage tournaments on BattleArena. You will retain full player privileges — you can still participate in other tournaments.
+          </p>
+        </div>
+
+        <div class="card ba-card">
+          <div class="card-body p-4">
+
+            <form action="/become-organiser" method="POST" id="applyForm" novalidate>
+
+              <!-- Full Name -->
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Full Name</label>
+                <input type="text" name="fullName" class="form-control"
+                  placeholder="Your real name — for accountability" required/>
+                <div class="form-text" style="font-size:0.72rem; color:#475569;">
+                  Not shown publicly. Used for admin verification only.
+                </div>
+              </div>
+
+              <!-- Tournament Type -->
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Type of Tournaments</label>
+                <select name="tournamentType" class="form-select" required>
+                  <option value="">Select category...</option>
+                  <option value="Esports">🎮 Esports (BGMI, Valorant, Free Fire etc.)</option>
+                  <option value="Sports">🏸 Sports (Badminton, Table Tennis etc.)</option>
+                  <option value="Board Games">♟️ Board Games (Chess, Carrom etc.)</option>
+                  <option value="Academic">📚 Academic (Coding, Quiz, Debate etc.)</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <!-- Specific Activity -->
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Specific Activity</label>
+                <input type="text" name="activity" class="form-control"
+                  placeholder="e.g. BGMI, Chess, Badminton, Python Coding..." required/>
+              </div>
+
+              <!-- Prior Experience -->
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Have you organised tournaments before?</label>
+                <div class="d-flex gap-3 mt-1">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="hasExperience"
+                      id="expYes" value="yes" onchange="toggleExpDetails(true)"/>
+                    <label class="form-check-label" for="expYes">Yes</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="hasExperience"
+                      id="expNo" value="no" checked onchange="toggleExpDetails(false)"/>
+                    <label class="form-check-label" for="expNo">No</label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Experience Details — shown only if Yes -->
+              <div class="mb-3" id="expDetailsBox" style="display:none;">
+                <label class="form-label fw-semibold">Brief description of your experience</label>
+                <textarea name="experienceDetails" class="form-control" rows="2"
+                  placeholder="Where, how many participants, what kind of tournaments..."></textarea>
+              </div>
+
+              <!-- Expected Participants -->
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Expected participants per tournament</label>
+                <select name="expectedParticipants" class="form-select" required>
+                  <option value="">Select range...</option>
+                  <option value="Under 10">Under 10</option>
+                  <option value="10-30">10 – 30</option>
+                  <option value="30-100">30 – 100</option>
+                  <option value="100+">100+</option>
+                </select>
+              </div>
+
+              <!-- Motivation -->
+              <div class="mb-3">
+                <label class="form-label fw-semibold">
+                  Why do you want to host on BattleArena?
+                  <span class="text-muted fw-normal">(100–300 characters)</span>
+                </label>
+                <textarea name="motivation" class="form-control" rows="3"
+                  id="motivation" minlength="100" maxlength="300"
+                  placeholder="Tell us why you want to organise here..." required></textarea>
+                <div class="form-text" id="motivationCount" style="font-size:0.72rem; color:#475569;">
+                  0 / 300
+                </div>
+              </div>
+
+              <!-- Social Link -->
+              <div class="mb-3">
+                <label class="form-label fw-semibold">
+                  Community / Social Link
+                  <span class="text-muted fw-normal">(optional)</span>
+                </label>
+                <input type="text" name="socialLink" class="form-control"
+                  placeholder="Discord server, Instagram page, YouTube channel..."/>
+              </div>
+
+              <!-- Code of Conduct -->
+              <div class="mb-4 p-3" style="background:rgba(56,189,248,0.04); border:1px solid rgba(56,189,248,0.15);">
+                <p style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:var(--cyber-blue); letter-spacing:0.2em; margin-bottom:12px;">
+                  // ORGANISER CODE OF CONDUCT
+                </p>
+                <ul class="list-unstyled mb-3" style="font-size:0.8rem; color:#94a3b8;">
+                  <li class="mb-2">› Run every tournament I create to completion</li>
+                  <li class="mb-2">› Declare results honestly based on actual match outcomes</li>
+                  <li class="mb-2">› Not manipulate brackets or results in any way</li>
+                  <li class="mb-2">› Respond to disputes within the platform's defined time windows</li>
+                  <li class="mb-2">› Not collect payments outside the platform for online tournaments</li>
+                  <li class="mb-2">› Accept that BattleArena admin decisions are final</li>
+                  <li class="mb-0">› Accept that my organiser status can be revoked for violations</li>
+                </ul>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="agreedToCoC" id="agreedToCoC" required/>
+                  <label class="form-check-label fw-semibold" for="agreedToCoC" style="font-size:0.85rem;">
+                    I have read and agree to the Organiser Code of Conduct
+                  </label>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-warning w-100 fw-bold py-2">
+                <i class="bi bi-send"></i> Submit Application
+              </button>
+
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <%- include('../partials/scripts') %>
+  <script>
+    function toggleExpDetails(show) {
+      document.getElementById("expDetailsBox").style.display = show ? "block" : "none";
+    }
+
+    const motivation = document.getElementById("motivation");
+    const counter = document.getElementById("motivationCount");
+    motivation.addEventListener("input", () => {
+      counter.textContent = `${motivation.value.length} / 300`;
+      counter.style.color = motivation.value.length < 100 ? "#ef4444" : "#475569";
+    });
+  </script>
+</body>
+</html>

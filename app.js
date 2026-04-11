@@ -17,6 +17,7 @@ const tournamentRoutes = require("./routes/tournament");
 const applicationRoutes = require("./routes/application");
 const profileRoutes = require("./routes/profile");
 const adminRoutes = require("./routes/admin");
+const orgApplicationRoutes = require("./routes/organiser-application");
 
 const app = express();
 
@@ -93,6 +94,7 @@ app.use("/admin", adminRoutes);
 app.use("/tournaments", tournamentRoutes);
 app.use("/tournaments", applicationRoutes);
 app.use("/profile", profileRoutes);
+app.use("/become-organiser", orgApplicationRoutes);
 
 // 404
 app.use((req, res) => {
