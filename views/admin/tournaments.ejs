@@ -18,6 +18,7 @@
       <a href="/admin" class="btn btn-outline-warning btn-sm">Dashboard</a>
       <a href="/admin/users" class="btn btn-outline-warning btn-sm">Users</a>
       <a href="/admin/tournaments" class="btn btn-warning btn-sm">Tournaments</a>
+      <a href="/admin/organiser-applications" class="btn btn-outline-warning btn-sm">Applications</a>
     </div>
 
     <!-- Filter -->
@@ -58,6 +59,7 @@
                 <th class="py-3">GAME</th>
                 <th class="py-3">ORGANISER</th>
                 <th class="py-3">STATUS</th>
+                <th class="py-3">REPORTS</th>
                 <th class="py-3">VISIBILITY</th>
                 <th class="py-3">ACTIONS</th>
               </tr>
@@ -88,6 +90,37 @@
                       <%= t.status.toUpperCase() %>
                     </span>
                   </td>
+
+                  <!-- REPORTS COLUMN -->
+                  <td class="py-3">
+                    <% if (t.status === 'completed') { %>
+                      <div class="d-flex flex-column gap-1">
+                        <% if (t.resultReports && t.resultReports.length > 0) { %>
+                          <button class="btn btn-sm btn-outline-danger"
+                            style="font-size:0.65rem; padding:2px 8px;"
+                            onclick='openTournamentReportsModal(
+                              "<%= t.title.replace(/"/g, "") %>",
+                              <%= t.resultReports.length %>,
+                              <%= t.resultSupports ? t.resultSupports.length : 0 %>,
+                              <%= JSON.stringify(t.resultReports.map(r => ({ reason: r.reason }))) %>
+                            )'>
+                            <i class="bi bi-flag-fill"></i> <%= t.resultReports.length %> report<%= t.resultReports.length !== 1 ? 's' : '' %>
+                          </button>
+                        <% } %>
+                        <% if (t.resultSupports && t.resultSupports.length > 0) { %>
+                          <span style="font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:#22c55e; letter-spacing:0.1em;">
+                            ✓ <%= t.resultSupports.length %> support<%= t.resultSupports.length !== 1 ? 's' : '' %>
+                          </span>
+                        <% } %>
+                        <% if ((!t.resultReports || t.resultReports.length === 0) && (!t.resultSupports || t.resultSupports.length === 0)) { %>
+                          <span style="font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:#334155;">—</span>
+                        <% } %>
+                      </div>
+                    <% } else { %>
+                      <span style="font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:#334155;">—</span>
+                    <% } %>
+                  </td>
+
                   <td class="py-3">
                     <% if (t.blocked) { %>
                       <span class="badge bg-danger">BLOCKED</span>
@@ -154,12 +187,67 @@
     </div>
   </div>
 
+  <!-- Tournament Reports Modal -->
+  <div class="modal fade" id="tournamentReportsModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content" style="background:#0a0f1e; border:1px solid rgba(239,68,68,0.3); border-radius:0;">
+        <div class="modal-header" style="border-bottom:1px solid rgba(239,68,68,0.15);">
+          <h6 class="modal-title fw-bold" style="font-family:'Orbitron',monospace; font-size:0.85rem; color:#ef4444;">
+            RESULT REPORTS — <span id="tournamentReportsTitle"></span>
+          </h6>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="d-flex gap-3 mb-3">
+            <span style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:#ef4444; letter-spacing:0.1em;">
+              ⚑ <span id="tournamentReportCount"></span> REPORT(S)
+            </span>
+            <span style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:#22c55e; letter-spacing:0.1em;">
+              ✓ <span id="tournamentSupportCount"></span> SUPPORT(S)
+            </span>
+          </div>
+          <div id="tournamentReportsBody"></div>
+        </div>
+        <div class="modal-footer" style="border-top:1px solid rgba(239,68,68,0.15);">
+          <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <%- include('../partials/scripts') %>
   <script>
     function openBlockModal(tournamentId, title) {
       document.getElementById("blockTitle").textContent = title;
       document.getElementById("blockForm").action = `/admin/tournaments/${tournamentId}/block?_method=PATCH`;
       new bootstrap.Modal(document.getElementById("blockModal")).show();
+    }
+
+    function openTournamentReportsModal(title, reportCount, supportCount, reports) {
+      document.getElementById("tournamentReportsTitle").textContent = title;
+      document.getElementById("tournamentReportCount").textContent = reportCount;
+      document.getElementById("tournamentSupportCount").textContent = supportCount;
+
+      let html = "";
+      if (reports.length === 0) {
+        html = `<p style="font-size:0.83rem; color:#475569;">No report reasons provided.</p>`;
+      } else {
+        reports.forEach((r, i) => {
+          html += `
+            <div style="border-bottom:1px solid rgba(239,68,68,0.1); padding:12px 0; ${i === 0 ? 'padding-top:0;' : ''}">
+              <div style="font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:#ef4444; letter-spacing:0.15em; margin-bottom:6px;">
+                REPORT ${i + 1}
+              </div>
+              <p style="font-size:0.83rem; color:#94a3b8; margin:0;">
+                ${r.reason || "No reason provided."}
+              </p>
+            </div>
+          `;
+        });
+      }
+
+      document.getElementById("tournamentReportsBody").innerHTML = html;
+      new bootstrap.Modal(document.getElementById("tournamentReportsModal")).show();
     }
   </script>
 </body>

@@ -9,28 +9,123 @@
   <div class="container my-5">
     <%- include('../partials/flash') %>
     <div class="row justify-content-center">
-      <div class="col-md-5">
-        <div class="card shadow border-0 ba-card">
+      <div class="col-md-6">
+
+        <!-- Basic Info -->
+        <div class="card shadow border-0 ba-card mb-4">
           <div class="card-body p-4">
-            <h4 class="fw-bold mb-4"><i class="bi bi-person-gear text-warning"></i> Edit Profile</h4>
+            <h4 class="fw-bold mb-4">
+              <i class="bi bi-person-gear text-warning"></i> Edit Profile
+            </h4>
             <form action="/profile/edit?_method=PUT" method="POST">
               <div class="mb-3">
-                <label class="form-label fw-semibold">In-Game Username</label>
+                <label class="form-label fw-semibold">Username</label>
+                <input type="text" name="username" class="form-control"
+                  value="<%= profileUser.username %>" required/>
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">
+                  Competitor Alias
+                  <span class="text-muted fw-normal">(optional)</span>
+                </label>
                 <input type="text" name="gameUsername" class="form-control"
-                  value="<%= profileUser.gameUsername || '' %>" placeholder="Your IGN"/>
+                  value="<%= profileUser.gameUsername || '' %>"
+                  placeholder="Your in-game name or handle"/>
               </div>
               <div class="mb-4">
-                <label class="form-label fw-semibold">Bio</label>
-                <textarea name="bio" class="form-control" rows="3" maxlength="300"
+                <label class="form-label fw-semibold">
+                  Bio
+                  <span class="text-muted fw-normal">(optional)</span>
+                </label>
+                <textarea name="bio" class="form-control" rows="3"
+                  maxlength="300"
                   placeholder="Tell others about yourself..."><%= profileUser.bio || '' %></textarea>
               </div>
               <div class="d-flex gap-2">
-                <button class="btn btn-warning fw-bold px-4">Save</button>
+                <button class="btn btn-warning fw-bold px-4">Save Changes</button>
                 <a href="/profile" class="btn btn-outline-secondary">Cancel</a>
               </div>
             </form>
           </div>
         </div>
+
+        <!-- Change Password -->
+        <!-- <div class="card shadow border-0 ba-card mb-4">
+          <div class="card-body p-4">
+            <h5 class="fw-bold mb-1">
+              <i class="bi bi-lock text-warning"></i> Change Password
+            </h5>
+            <p style="font-size:0.78rem; color:#475569; margin-bottom:20px;">
+              Enter your current password to confirm your identity.
+            </p>
+            <form action="/profile/change-password" method="POST">
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Current Password</label>
+                <input type="password" name="currentPassword" class="form-control"
+                  placeholder="Your current password" required/>
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">New Password</label>
+                <input type="password" name="newPassword" class="form-control"
+                  placeholder="Min 6 characters" required/>
+              </div>
+              <div class="mb-4">
+                <label class="form-label fw-semibold">Confirm New Password</label>
+                <input type="password" name="confirmPassword" class="form-control"
+                  placeholder="Repeat new password" required/>
+              </div>
+              <button class="btn btn-outline-warning fw-bold px-4">
+                Update Password
+              </button>
+            </form>
+          </div>
+        </div> -->
+
+        <!-- Change Email -->
+        <!-- <div class="card shadow border-0 ba-card mb-4">
+          <div class="card-body p-4">
+            <h5 class="fw-bold mb-1">
+              <i class="bi bi-envelope text-warning"></i> Change Email
+            </h5>
+            <p style="font-size:0.78rem; color:#475569; margin-bottom:4px;">
+              Current email: <strong style="color:var(--cyber-blue);"><%= profileUser.email %></strong>
+            </p>
+            <p style="font-size:0.75rem; color:#475569; margin-bottom:20px;">
+              An OTP will be sent to your new email to verify it.
+            </p>
+
+             Step 1 — Enter new email 
+            <form action="/profile/change-email/send-otp" method="POST" class="mb-3">
+              <div class="mb-3">
+                <label class="form-label fw-semibold">New Email Address</label>
+                <input type="email" name="newEmail" class="form-control"
+                  placeholder="your.new@email.com" required/>
+              </div>
+              <button class="btn btn-outline-warning btn-sm fw-bold px-4">
+                Send OTP to New Email
+              </button>
+            </form>
+
+            <hr style="border-color:rgba(56,189,248,0.1);"/> -->
+
+            <!-- Step 2 — Enter OTP -->
+            <!-- <p style="font-size:0.78rem; color:#475569; margin-bottom:12px;">
+              After receiving the OTP, enter it below:
+            </p>
+            <form action="/profile/change-email/verify" method="POST">
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Enter OTP</label>
+                <input type="text" name="otp" class="form-control"
+                  maxlength="6" placeholder="6-digit OTP"
+                  style="font-family:'Share Tech Mono',monospace; letter-spacing:0.2em;"/>
+              </div>
+              <button class="btn btn-warning btn-sm fw-bold px-4">
+                Verify & Update Email
+              </button>
+            </form>
+          </div>
+        </div> -->
+
       </div>
     </div>
   </div>

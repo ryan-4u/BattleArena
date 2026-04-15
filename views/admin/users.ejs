@@ -18,6 +18,7 @@
       <a href="/admin" class="btn btn-outline-warning btn-sm">Dashboard</a>
       <a href="/admin/users" class="btn btn-warning btn-sm">Users</a>
       <a href="/admin/tournaments" class="btn btn-outline-warning btn-sm">Tournaments</a>
+      <a href="/admin/organiser-applications" class="btn btn-outline-warning btn-sm">Applications</a>
     </div>
 
     <!-- Filter -->
@@ -58,6 +59,7 @@
                 <th class="py-3">EMAIL</th>
                 <th class="py-3">ROLE</th>
                 <th class="py-3">STATUS</th>
+                <th class="py-3">REPORTS</th>
                 <th class="py-3">JOINED</th>
                 <th class="py-3">ACTIONS</th>
               </tr>
@@ -90,6 +92,25 @@
                       </span>
                     <% } %>
                   </td>
+
+                  <!-- REPORTS COLUMN -->
+                  <td class="py-3">
+                    <% if (user.profileReports && user.profileReports.length > 0) { %>
+                      <button class="btn btn-sm btn-outline-danger"
+                        style="font-size:0.65rem; padding:2px 8px;"
+                        onclick='openReportsModal(
+                          "<%= user.username %>",
+                          <%= JSON.stringify(user.profileReports.map(r => ({ reason: r.reason, reportedAt: r.reportedAt }))) %>
+                        )'>
+                        <i class="bi bi-flag-fill"></i> <%= user.profileReports.length %>
+                      </button>
+                    <% } else { %>
+                      <span style="font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:#334155;">
+                        —
+                      </span>
+                    <% } %>
+                  </td>
+
                   <td class="py-3" style="font-size:0.72rem; color:#475569; font-family:'Share Tech Mono',monospace;">
                     <%= new Date(user.createdAt).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) %>
                   </td>
@@ -169,12 +190,55 @@
     </div>
   </div>
 
+  <!-- Profile Reports Modal -->
+  <div class="modal fade" id="reportsModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content" style="background:#0a0f1e; border:1px solid rgba(239,68,68,0.3); border-radius:0;">
+        <div class="modal-header" style="border-bottom:1px solid rgba(239,68,68,0.15);">
+          <h6 class="modal-title fw-bold" style="font-family:'Orbitron',monospace; font-size:0.85rem; color:#ef4444;">
+            PROFILE REPORTS — <span id="reportsModalUsername"></span>
+          </h6>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="reportsModalBody">
+        </div>
+        <div class="modal-footer" style="border-top:1px solid rgba(239,68,68,0.15);">
+          <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <%- include('../partials/scripts') %>
   <script>
     function openBanModal(userId, username) {
       document.getElementById("banUsername").textContent = username;
       document.getElementById("banForm").action = `/admin/users/${userId}/ban?_method=PATCH`;
       new bootstrap.Modal(document.getElementById("banModal")).show();
+    }
+
+    function openReportsModal(username, reports) {
+      document.getElementById("reportsModalUsername").textContent = username;
+
+      let html = "";
+      reports.forEach((r, i) => {
+        const date = new Date(r.reportedAt).toLocaleDateString("en-IN", {
+          day: "numeric", month: "short", year: "numeric"
+        });
+        html += `
+          <div style="border-bottom:1px solid rgba(239,68,68,0.1); padding:12px 0; ${i === 0 ? 'padding-top:0;' : ''}">
+            <div style="font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:#ef4444; letter-spacing:0.15em; margin-bottom:6px;">
+              REPORT ${i + 1} · ${date}
+            </div>
+            <p style="font-size:0.83rem; color:#94a3b8; margin:0;">
+              ${r.reason || "No reason provided."}
+            </p>
+          </div>
+        `;
+      });
+
+      document.getElementById("reportsModalBody").innerHTML = html;
+      new bootstrap.Modal(document.getElementById("reportsModal")).show();
     }
   </script>
 </body>

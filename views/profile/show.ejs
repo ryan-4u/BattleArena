@@ -19,7 +19,9 @@
           <h4 class="fw-bold"><%= profileUser.username %></h4>
           <span class="badge bg-warning text-dark mb-2"><%= profileUser.role %></span>
           <% if (profileUser.gameUsername) { %>
-            <p class="text-muted small"><i class="bi bi-controller"></i> <%= profileUser.gameUsername %></p>
+            <p class="text-muted small">
+              <i class="bi bi-controller"></i> <%= profileUser.gameUsername %>
+            </p>
           <% } %>
           <% if (profileUser.bio) { %>
             <p class="small"><%= profileUser.bio %></p>
@@ -32,7 +34,7 @@
             </div>
           <% } %>
 
-          <!-- Report count — visible to everyone -->
+          <!-- Report count -->
           <% if (profileUser.profileReports && profileUser.profileReports.length > 0) { %>
             <div class="mt-2">
               <span style="font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:#ef4444; letter-spacing:0.1em;">
@@ -42,14 +44,21 @@
           <% } %>
 
           <% if (isOwn) { %>
-            <a href="/profile/edit" class="btn btn-outline-warning btn-sm mt-2">
-              <i class="bi bi-pencil"></i> Edit Profile
-            </a>
-            <% if (profileUser.role === 'player') { %>
-              <a href="/become-organiser" class="btn btn-outline-info btn-sm mt-2">
-                <i class="bi bi-megaphone"></i> Become an Organiser
+            <div class="d-flex flex-column gap-2 mt-3">
+              <a href="/profile/edit" class="btn btn-outline-warning btn-sm">
+                <i class="bi bi-pencil"></i> Edit Profile
               </a>
-            <% } %>
+              <% if (profileUser.role === 'player') { %>
+                <a href="/become-organiser" class="btn btn-outline-info btn-sm">
+                  <i class="bi bi-megaphone"></i> Become an Organiser
+                </a>
+              <% } %>
+              <% if (profileUser.role === 'admin') { %>
+                <a href="/admin" class="btn btn-warning btn-sm fw-bold">
+                  <i class="bi bi-shield-lock-fill"></i> Admin Dashboard
+                </a>
+              <% } %>
+            </div>
           <% } else if (currUser) { %>
             <%
               const alreadyReportedProfile = profileUser.profileReports &&
@@ -63,7 +72,8 @@
                 </span>
               </div>
             <% } else { %>
-              <button class="btn btn-outline-danger btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#reportProfileModal">
+              <button class="btn btn-outline-danger btn-sm mt-2"
+                data-bs-toggle="modal" data-bs-target="#reportProfileModal">
                 <i class="bi bi-flag"></i> Report Profile
               </button>
             <% } %>
@@ -71,18 +81,20 @@
         </div>
       </div>
 
-      <!-- Tournaments -->
+      <!-- Tournaments Section -->
       <div class="col-md-8">
+
         <% if (profileUser.role === 'player') { %>
 
-          <!-- Wins section -->
+          <!-- Wins -->
           <% if (profileUser.tournamentsWon && profileUser.tournamentsWon.length > 0) { %>
             <h5 class="fw-bold mb-3">
               <i class="bi bi-trophy-fill" style="color:#facc15;"></i> Tournament Wins
             </h5>
             <div class="list-group mb-4">
               <% for (let t of profileUser.tournamentsWon) { %>
-                <a href="/tournaments/<%= t._id %>" class="list-group-item list-group-item-action ba-list-item"
+                <a href="/tournaments/<%= t._id %>"
+                  class="list-group-item list-group-item-action ba-list-item"
                   style="border-left:3px solid #facc15;">
                   <div class="d-flex justify-content-between align-items-center">
                     <span class="fw-semibold" style="color:#facc15;">🏆 <%= t.title %></span>
@@ -94,7 +106,7 @@
             </div>
           <% } %>
 
-          <!-- Tournaments Joined -->
+          <!-- Joined -->
           <h5 class="fw-bold mb-3">
             <i class="bi bi-trophy text-warning"></i> Tournaments Joined
           </h5>
@@ -103,11 +115,13 @@
           <% } else { %>
             <div class="list-group">
               <% for (let t of profileUser.tournamentsJoined) { %>
-                <a href="/tournaments/<%= t._id %>" class="list-group-item list-group-item-action ba-list-item">
+                <a href="/tournaments/<%= t._id %>"
+                  class="list-group-item list-group-item-action ba-list-item">
                   <div class="d-flex justify-content-between">
                     <span class="fw-semibold"><%= t.title %></span>
                     <span class="badge
-                      <%= t.status === 'upcoming' ? 'bg-success' : t.status === 'ongoing' ? 'bg-warning text-dark' : 'bg-secondary' %>">
+                      <%= t.status === 'upcoming' ? 'bg-success' :
+                          t.status === 'ongoing'  ? 'bg-warning text-dark' : 'bg-secondary' %>">
                       <%= t.status %>
                     </span>
                   </div>
@@ -119,26 +133,82 @@
 
         <% } else { %>
 
-          <!-- Tournaments Organised -->
+          <!-- ORGANISER LAYOUT -->
+
+          <!-- Wins (if any) -->
+          <% if (profileUser.tournamentsWon && profileUser.tournamentsWon.length > 0) { %>
+            <h5 class="fw-bold mb-3">
+              <i class="bi bi-trophy-fill" style="color:#facc15;"></i> Tournament Wins
+            </h5>
+            <div class="list-group mb-4">
+              <% for (let t of profileUser.tournamentsWon) { %>
+                <a href="/tournaments/<%= t._id %>"
+                  class="list-group-item list-group-item-action ba-list-item"
+                  style="border-left:3px solid #facc15;">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-semibold" style="color:#facc15;">🏆 <%= t.title %></span>
+                    <span class="badge bg-secondary"><%= t.status %></span>
+                  </div>
+                  <small class="text-muted"><%= t.game %> | <%= t.mode %></small>
+                </a>
+              <% } %>
+            </div>
+          <% } %>
+
+          <!-- Organised -->
           <h5 class="fw-bold mb-3">
-            <i class="bi bi-trophy text-warning"></i> Tournaments Organised
+            <i class="bi bi-megaphone text-warning"></i> Tournaments Organised
           </h5>
           <% if (profileUser.tournamentsOrganised.length === 0) { %>
             <p class="text-muted">No tournaments organised yet.</p>
           <% } else { %>
-            <div class="list-group">
+            <div class="list-group mb-4">
               <% for (let t of profileUser.tournamentsOrganised) { %>
-                <a href="/tournaments/<%= t._id %>" class="list-group-item list-group-item-action ba-list-item">
+                <a href="/tournaments/<%= t._id %>"
+                  class="list-group-item list-group-item-action ba-list-item">
                   <div class="d-flex justify-content-between">
                     <span class="fw-semibold"><%= t.title %></span>
                     <span class="badge
-                      <%= t.status === 'upcoming' ? 'bg-success' : t.status === 'ongoing' ? 'bg-warning text-dark' : 'bg-secondary' %>">
+                      <%= t.status === 'upcoming' ? 'bg-success' :
+                          t.status === 'ongoing'  ? 'bg-warning text-dark' : 'bg-secondary' %>">
                       <%= t.status %>
                     </span>
                   </div>
                   <small class="text-muted"><%= t.game %> | <%= t.mode %></small>
                 </a>
               <% } %>
+            </div>
+          <% } %>
+
+          <!-- Toggle button for joined -->
+          <% if (profileUser.tournamentsJoined && profileUser.tournamentsJoined.length > 0) { %>
+            <div class="mb-3">
+              <button class="btn btn-outline-warning btn-sm" id="toggleJoinedBtn"
+                onclick="toggleJoined()">
+                <i class="bi bi-eye"></i> Show Tournaments Joined
+                (<%= profileUser.tournamentsJoined.length %>)
+              </button>
+            </div>
+            <div id="joinedSection" style="display:none;">
+              <h5 class="fw-bold mb-3">
+                <i class="bi bi-trophy text-warning"></i> Tournaments Joined
+              </h5>
+              <div class="list-group">
+                <% for (let t of profileUser.tournamentsJoined) { %>
+                  <a href="/tournaments/<%= t._id %>"
+                    class="list-group-item list-group-item-action ba-list-item">
+                    <div class="d-flex justify-content-between">
+                      <span class="fw-semibold"><%= t.title %></span>
+                      <span class="badge
+                        <%= t.status === 'upcoming' ? 'bg-success' :
+                            t.status === 'ongoing'  ? 'bg-warning text-dark' : 'bg-secondary' %>">
+                        <%= t.status %>
+                      </span>
+                    </div>
+                    <small class="text-muted"><%= t.game %> | <%= t.mode %></small>
+                  </a>
+                <% } %>
+              </div>
             </div>
           <% } %>
 
@@ -151,9 +221,11 @@
   <!-- Report Profile Modal -->
   <div class="modal fade" id="reportProfileModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content" style="background:#0a0f1e; border:1px solid rgba(239,68,68,0.3); border-radius:0;">
+      <div class="modal-content"
+        style="background:#0a0f1e; border:1px solid rgba(239,68,68,0.3); border-radius:0;">
         <div class="modal-header" style="border-bottom:1px solid rgba(239,68,68,0.15);">
-          <h6 class="modal-title fw-bold" style="font-family:'Orbitron',monospace; font-size:0.85rem; color:#ef4444;">
+          <h6 class="modal-title fw-bold"
+            style="font-family:'Orbitron',monospace; font-size:0.85rem; color:#ef4444;">
             REPORT PROFILE
           </h6>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
@@ -161,14 +233,16 @@
         <form action="/profile/<%= profileUser._id %>/report" method="POST">
           <div class="modal-body">
             <p style="font-size:0.82rem; color:#94a3b8; margin-bottom:14px;">
-              Tell us why you are reporting <strong style="color:var(--cyber-blue);"><%= profileUser.username %></strong>.
+              Tell us why you are reporting
+              <strong style="color:var(--cyber-blue);"><%= profileUser.username %></strong>.
             </p>
             <label class="form-label fw-semibold" style="font-size:0.78rem;">Reason</label>
             <textarea name="reason" class="form-control" rows="3"
               placeholder="e.g. Fake account, harassment, cheating..."></textarea>
           </div>
           <div class="modal-footer" style="border-top:1px solid rgba(239,68,68,0.15);">
-            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm"
+              data-bs-dismiss="modal">Cancel</button>
             <button type="submit" class="btn btn-danger btn-sm">Submit Report</button>
           </div>
         </form>
@@ -177,5 +251,16 @@
   </div>
 
   <%- include('../partials/scripts') %>
+  <script>
+    function toggleJoined() {
+      const section = document.getElementById("joinedSection");
+      const btn = document.getElementById("toggleJoinedBtn");
+      const isHidden = section.style.display === "none";
+      section.style.display = isHidden ? "block" : "none";
+      btn.innerHTML = isHidden
+        ? '<i class="bi bi-eye-slash"></i> Hide Tournaments Joined'
+        : '<i class="bi bi-eye"></i> Show Tournaments Joined (<%= profileUser.tournamentsJoined.length %>)';
+    }
+  </script>
 </body>
 </html>
