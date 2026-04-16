@@ -2,8 +2,7 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/user");
 const Tournament = require("../models/tournament");
-const { isLoggedIn, isOrganiser, isTournamentOwner } = require("../middleware");
-
+const { isLoggedIn, isOrganiser, isTournamentOwner, autoRejectExpiredApplications } = require("../middleware");
 // INDEX
 router.get("/", async (req, res) => {
   const { search, game, status } = req.query;
@@ -57,7 +56,7 @@ router.post("/", isLoggedIn, isOrganiser, async (req, res) => {
 });
 
 // SHOW
-router.get("/:id", async (req, res) => {
+router.get("/:id", autoRejectExpiredApplications, async (req, res) => {
   const tournament = await Tournament.findById(req.params.id)
     .populate("organiser")
     .populate("applicants.player")
@@ -153,7 +152,10 @@ router.patch("/:id/declare-winner", isLoggedIn, isOrganiser, isTournamentOwner, 
   const tournament = await Tournament.findById(req.params.id);
   if (!tournament) { req.flash("error", "Tournament not found."); return res.redirect("/tournaments"); }
   if (tournament.status === "completed") { req.flash("error", "Winner already declared."); return res.redirect(`/tournaments/${req.params.id}`); }
-
+  if (tournament.tournamentFormat === "bracket") {
+    req.flash("error", "Bracket tournaments determine the winner automatically.");
+    return res.redirect(`/tournaments/${req.params.id}`);
+  }
   const isAcceptedPlayer = tournament.applicants.some(a => a.player.equals(winnerId) && a.status === "accepted");
   if (!isAcceptedPlayer) { req.flash("error", "Selected winner must be an accepted participant."); return res.redirect(`/tournaments/${req.params.id}`); }
 

@@ -42,8 +42,16 @@ router.post("/:id/bracket/generate", isLoggedIn, isOrganiser, isTournamentOwner,
     return res.redirect(`/tournaments/${req.params.id}/bracket`);
   }
 
-  if (tournament.status !== "ongoing") {
-    req.flash("error", "Bracket can only be generated for ongoing tournaments.");
+  const now = new Date();
+  const deadlinePassed = now > new Date(tournament.registrationDeadline);
+
+  if (tournament.status === "upcoming" && !deadlinePassed) {
+    req.flash("error", "Bracket can only be generated after the registration deadline has passed or the tournament is ongoing.");
+    return res.redirect(`/tournaments/${req.params.id}`);
+  }
+
+  if (tournament.tournamentFormat !== "bracket") {
+    req.flash("error", "This tournament uses simple format — no bracket needed.");
     return res.redirect(`/tournaments/${req.params.id}`);
   }
 

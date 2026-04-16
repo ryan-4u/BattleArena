@@ -25,6 +25,11 @@ const tournamentSchema = new mongoose.Schema({
     enum: ["Solo", "Duo", "Squad", "1v1", "Team", "Individual"],
     required: true
   },
+  tournamentFormat: {
+    type: String,
+    enum: ["simple", "bracket"],
+    default: "bracket"
+  },
   prizePool:            { type: String, default: "No Prize" },
   entryFee:             { type: Number, default: 0 },
   maxPlayers:           { type: Number, required: true },

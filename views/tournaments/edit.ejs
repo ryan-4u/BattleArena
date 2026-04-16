@@ -142,6 +142,52 @@
                 </select>
               </div>
 
+              <!-- Tournament Format -->
+              <div class="mb-4">
+                <label class="form-label fw-semibold">Tournament Format</label>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="d-block" style="cursor:pointer;">
+                      <input type="radio" name="tournament[tournamentFormat]" value="simple"
+                        class="d-none format-radio" id="formatSimple"
+                        <%= tournament.tournamentFormat === 'simple' ? 'checked' : '' %>/>
+                      <div class="format-card p-3" id="formatSimpleCard"
+                        style="border:1px solid <%= tournament.tournamentFormat === 'simple' ? 'rgba(250,204,21,0.5)' : 'rgba(56,189,248,0.2)' %>; background:<%= tournament.tournamentFormat === 'simple' ? 'rgba(250,204,21,0.04)' : 'transparent' %>; border-radius:4px; transition:all 0.2s;">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                          <div class="format-dot" style="width:10px; height:10px; border-radius:50%; background:<%= tournament.tournamentFormat === 'simple' ? '#facc15' : 'transparent' %>; border:2px solid #facc15;"></div>
+                          <span class="fw-semibold" style="font-size:0.9rem;">Simple Match</span>
+                        </div>
+                        <p style="font-size:0.75rem; color:#475569; margin:0; font-family:'DM Sans';">
+                          Single match or session. Organiser declares the winner directly. Best for: Battle Royale lobbies, single chess games, one-round events.
+                        </p>
+                      </div>
+                    </label>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="d-block" style="cursor:pointer;">
+                      <input type="radio" name="tournament[tournamentFormat]" value="bracket"
+                        class="d-none format-radio" id="formatBracket"
+                        <%= (!tournament.tournamentFormat || tournament.tournamentFormat === 'bracket') ? 'checked' : '' %>/>
+                      <div class="format-card p-3" id="formatBracketCard"
+                        style="border:1px solid <%= (!tournament.tournamentFormat || tournament.tournamentFormat === 'bracket') ? 'rgba(250,204,21,0.5)' : 'rgba(56,189,248,0.2)' %>; background:<%= (!tournament.tournamentFormat || tournament.tournamentFormat === 'bracket') ? 'rgba(250,204,21,0.04)' : 'transparent' %>; border-radius:4px; transition:all 0.2s;">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                          <div class="format-dot" style="width:10px; height:10px; border-radius:50%; background:<%= (!tournament.tournamentFormat || tournament.tournamentFormat === 'bracket') ? '#facc15' : 'transparent' %>; border:2px solid #facc15;"></div>
+                          <span class="fw-semibold" style="font-size:0.9rem;">Bracket Tournament</span>
+                        </div>
+                        <p style="font-size:0.75rem; color:#475569; margin:0; font-family:'DM Sans';">
+                          Multi-round elimination bracket. Players progress round by round. Best for: large tournaments, offline sports, chess championships, coding contests.
+                        </p>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+                <% if (tournament.bracketGenerated) { %>
+                  <p style="font-size:0.75rem; color:#f97316; margin-top:8px;">
+                    <i class="bi bi-exclamation-triangle"></i> Bracket already generated — format cannot be changed.
+                  </p>
+                <% } %>
+              </div>
+
               <div class="d-flex gap-2">
                 <button type="submit" class="btn btn-warning fw-bold px-4">
                   <i class="bi bi-save"></i> Save Changes
@@ -158,5 +204,21 @@
 
   <%- include('../partials/scripts') %>
   <script src="/js/tournament-form.js"></script>
+  <script>
+    // Format card toggle
+    document.querySelectorAll('.format-radio').forEach(radio => {
+      radio.addEventListener('change', () => {
+        document.querySelectorAll('.format-card').forEach(card => {
+          card.style.border = '1px solid rgba(56,189,248,0.2)';
+          card.style.background = 'transparent';
+          card.querySelector('.format-dot').style.background = 'transparent';
+        });
+        const selectedCard = radio.nextElementSibling;
+        selectedCard.style.border = '1px solid rgba(250,204,21,0.5)';
+        selectedCard.style.background = 'rgba(250,204,21,0.04)';
+        selectedCard.querySelector('.format-dot').style.background = '#facc15';
+      });
+    });
+  </script>
 </body>
 </html>

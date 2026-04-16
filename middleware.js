@@ -54,7 +54,6 @@ module.exports.isAdmin = (req, res, next) => {
 
 module.exports.autoUpdateTournamentStatus = async (req, res, next) => {
   try {
-    const Tournament = require("./models/tournament");
     const now = new Date();
     const sevenDaysAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
 
@@ -71,6 +70,37 @@ module.exports.autoUpdateTournamentStatus = async (req, res, next) => {
     console.log(`Status update: ${upcomingToOngoing.modifiedCount} → ongoing, ${ongoingToCompleted.modifiedCount} → completed`);
   } catch (err) {
     console.error("Status auto-update error:", err);
+  }
+  next();
+};
+
+// Passive — runs on tournament SHOW route only
+// Rejects all pending applications if registration deadline has passed
+module.exports.autoRejectExpiredApplications = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (!id) return next();
+
+    const tournament = await Tournament.findById(id);
+    if (!tournament) return next();
+
+    const now = new Date();
+    const deadlinePassed = now > new Date(tournament.registrationDeadline);
+    const isOngoing = tournament.status === "ongoing" || tournament.status === "completed";
+
+    if (deadlinePassed || isOngoing) {
+      const hasPending = tournament.applicants.some(a => a.status === "pending");
+      if (hasPending) {
+        await Tournament.findByIdAndUpdate(id, {
+          $set: { "applicants.$[elem].status": "rejected" }
+        }, {
+          arrayFilters: [{ "elem.status": "pending" }],
+          new: true
+        });
+      }
+    }
+  } catch (err) {
+    console.error("Auto-reject error:", err);
   }
   next();
 };

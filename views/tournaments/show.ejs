@@ -221,59 +221,109 @@
           </div>
         <% } %>
 
-        <!-- Organiser Actions -->
+        
+        <!-- Organiser action section — format-aware -->
         <% if (currUser && tournament.organiser._id.equals(currUser._id)) { %>
-          <div class="d-flex gap-2 mb-4 flex-wrap">
-            <a href="/tournaments/<%= tournament._id %>/edit" class="btn btn-outline-warning">
-              <i class="bi bi-pencil"></i> Edit Tournament
-            </a>
-            <form action="/tournaments/<%= tournament._id %>?_method=DELETE" method="POST"
-              onsubmit="return confirm('Delete this tournament? This cannot be undone.')">
-              <button class="btn btn-outline-danger"><i class="bi bi-trash"></i> Delete</button>
-            </form>
-          </div>
-
-          <!-- Bracket Section -->
-          <% if (tournament.status === 'ongoing') { %>
+          <% if (tournament.status === 'ongoing' || (tournament.status === 'upcoming' && new Date() > new Date(tournament.registrationDeadline))) { %>
             <% const acceptedPlayers = tournament.applicants.filter(a => a.status === 'accepted'); %>
-            <div class="card ba-card mb-4" style="border-color:rgba(56,189,248,0.2);">
-              <div class="card-body p-4">
-                <% if (!tournament.bracketGenerated) { %>
-                  <p style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:var(--cyber-blue); letter-spacing:0.2em; margin-bottom:6px;">// BRACKET</p>
-                  <% if (acceptedPlayers.length >= 2) { %>
-                    <%
-                      const n = acceptedPlayers.length;
-                      const mainSize = Math.pow(2, Math.floor(Math.log2(n)));
-                      const prelimCount = n - mainSize;
-                    %>
-                    <p style="font-size:0.8rem; color:#475569; margin-bottom:6px;">
-                      <strong style="color:#94a3b8;"><%= acceptedPlayers.length %></strong> participants accepted.
-                      <% if (prelimCount > 0) { %>
-                        <strong style="color:#f97316;"><%= prelimCount * 2 %></strong> will play a qualifying round first.
-                      <% } else { %>
-                        Clean draw — no qualifying round needed.
-                      <% } %>
-                    </p>
-                    <p style="font-size:0.75rem; color:#475569; margin-bottom:16px;">This action is permanent and cannot be undone.</p>
-                    <form action="/tournaments/<%= tournament._id %>/bracket/generate" method="POST"
-                      onsubmit="return confirm('Generate bracket? This cannot be undone.')">
-                      <button type="submit" class="btn btn-warning fw-bold px-4">
-                        <i class="bi bi-diagram-3-fill"></i> Generate Bracket
-                      </button>
-                    </form>
+
+            <% if (tournament.tournamentFormat === 'simple') { %>
+              <!-- SIMPLE FORMAT: Declare Winner -->
+              <div class="card ba-card mb-4" style="border-color:rgba(250,204,21,0.2);">
+                <div class="card-body p-4">
+                  <% if (tournament.status !== 'completed') { %>
+                    <p style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:#facc15; letter-spacing:0.2em; margin-bottom:6px;">// DECLARE WINNER</p>
+                    <% if (acceptedPlayers.length > 0) { %>
+                      <p style="font-size:0.78rem; color:#475569; margin-bottom:16px;">
+                        Select the winner from confirmed participants. Tournament will be marked as completed.
+                      </p>
+                      <form action="/tournaments/<%= tournament._id %>/declare-winner?_method=PATCH" method="POST"
+                        onsubmit="return confirm('Declare this participant as winner? This cannot be undone.')">
+                        <div class="row g-2">
+                          <div class="col-md-8">
+                            <select name="winnerId" class="form-select" required>
+                              <option value="">Select winner...</option>
+                              <% acceptedPlayers.forEach(app => { %>
+                                <option value="<%= app.player._id %>"><%= app.player.username %></option>
+                              <% }) %>
+                            </select>
+                          </div>
+                          <div class="col-md-4">
+                            <button type="submit" class="btn btn-warning w-100 fw-bold">
+                              <i class="bi bi-trophy-fill"></i> Declare Winner
+                            </button>
+                          </div>
+                        </div>
+                      </form>
+                    <% } else { %>
+                      <p style="font-size:0.8rem; color:#475569; margin-bottom:0;">
+                        No confirmed participants yet. Accept at least one participant first.
+                      </p>
+                    <% } %>
                   <% } else { %>
-                    <p style="font-size:0.8rem; color:#475569; margin-bottom:0;">Accept at least <strong>2 participants</strong> before generating the bracket.</p>
+                    <p style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:#22c55e; letter-spacing:0.2em; margin-bottom:0;">✓ TOURNAMENT COMPLETED</p>
                   <% } %>
-                <% } else { %>
-                  <p style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:#22c55e; letter-spacing:0.2em; margin-bottom:10px;">✓ BRACKET ACTIVE</p>
-                  <a href="/tournaments/<%= tournament._id %>/bracket" class="btn btn-warning fw-bold px-4">
-                    <i class="bi bi-diagram-3-fill"></i> Manage Bracket
-                  </a>
-                <% } %>
+                </div>
+              </div>
+
+            <% } else { %>
+              <!-- BRACKET FORMAT: Generate Bracket -->
+              <div class="card ba-card mb-4" style="border-color:rgba(56,189,248,0.2);">
+                <div class="card-body p-4">
+                  <% if (!tournament.bracketGenerated) { %>
+                    <p style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:var(--cyber-blue); letter-spacing:0.2em; margin-bottom:6px;">// BRACKET</p>
+                    <% if (acceptedPlayers.length >= 2) { %>
+                      <%
+                        const n = acceptedPlayers.length;
+                        const mainSize = Math.pow(2, Math.floor(Math.log2(n)));
+                        const prelimCount = n - mainSize;
+                      %>
+                      <p style="font-size:0.8rem; color:#475569; margin-bottom:6px;">
+                        <strong style="color:#94a3b8;"><%= acceptedPlayers.length %></strong> participants confirmed.
+                        <% if (prelimCount > 0) { %>
+                          <strong style="color:#f97316;"><%= prelimCount * 2 %></strong> will play a qualifying round first.
+                        <% } else { %>
+                          Clean draw — no qualifying round needed.
+                        <% } %>
+                      </p>
+                      <p style="font-size:0.75rem; color:#475569; margin-bottom:16px;">This action is permanent and cannot be undone.</p>
+                      <form action="/tournaments/<%= tournament._id %>/bracket/generate" method="POST"
+                        onsubmit="return confirm('Generate bracket? This cannot be undone.')">
+                        <button type="submit" class="btn btn-warning fw-bold px-4">
+                          <i class="bi bi-diagram-3-fill"></i> Generate Bracket
+                        </button>
+                      </form>
+                    <% } else { %>
+                      <p style="font-size:0.8rem; color:#475569; margin-bottom:0;">Accept at least <strong>2 participants</strong> before generating the bracket.</p>
+                    <% } %>
+                  <% } else { %>
+                    <p style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:#22c55e; letter-spacing:0.2em; margin-bottom:10px;">✓ BRACKET ACTIVE</p>
+                    <a href="/tournaments/<%= tournament._id %>/bracket" class="btn btn-warning fw-bold px-4">
+                      <i class="bi bi-diagram-3-fill"></i> Manage Bracket
+                    </a>
+                  <% } %>
+                </div>
+              </div>
+            <% } %>
+
+          <% } else if (tournament.status === 'upcoming') { %>
+            <!-- Registration still open — show deadline info -->
+            <div class="card ba-card mb-4" style="border-color:rgba(71,85,105,0.2);">
+              <div class="card-body p-4">
+                <p style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:#475569; letter-spacing:0.2em; margin-bottom:6px;">
+                  // <%= tournament.tournamentFormat === 'simple' ? 'WINNER DECLARATION' : 'BRACKET GENERATION' %>
+                </p>
+                <p style="font-size:0.8rem; color:#475569; margin-bottom:0;">
+                  Available after registration closes on
+                  <strong style="color:#94a3b8;">
+                    <%= new Date(tournament.registrationDeadline).toLocaleString('en-IN', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) %>
+                  </strong>
+                </p>
               </div>
             </div>
           <% } %>
         <% } %>
+        
 
         <!-- Apply Section -->
         <% if (currUser && currUser.role === 'player') { %>
@@ -289,6 +339,10 @@
               <div class="alert alert-danger"><i class="bi bi-slash-circle"></i> Registration is closed for this tournament.</div>
             <% } else if (tournament.bracketGenerated) { %>
               <div class="alert alert-info"><i class="bi bi-diagram-3"></i> The bracket has been drawn. Registration is now closed.</div>
+            <% } else if (tournament.status === 'ongoing') { %>
+              <div class="alert alert-warning"><i class="bi bi-lock"></i> This tournament is already underway. Registration is closed.</div>
+            <% } else if (new Date() > new Date(tournament.registrationDeadline)) { %>
+              <div class="alert alert-warning"><i class="bi bi-clock"></i> Registration deadline has passed.</div>
             <% } else { %>
               <form action="/tournaments/<%= tournament._id %>/apply" method="POST">
                 <button class="btn btn-warning fw-bold px-4 py-2"><i class="bi bi-send"></i> Register / Apply</button>

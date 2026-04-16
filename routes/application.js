@@ -13,6 +13,20 @@ router.post("/:id/apply", isLoggedIn, isPlayer, async (req, res) => {
     return res.redirect("/tournaments");
   }
 
+  // ── NEW GUARDS ──────────────────────────────────────────
+  const now = new Date();
+
+  if (now > new Date(tournament.registrationDeadline)) {
+    req.flash("error", "Registration deadline has passed. You can no longer apply.");
+    return res.redirect(`/tournaments/${req.params.id}`);
+  }
+
+  if (tournament.status === "ongoing" || tournament.status === "completed") {
+    req.flash("error", "Registration is closed — this tournament is already underway.");
+    return res.redirect(`/tournaments/${req.params.id}`);
+  }
+  // ────────────────────────────────────────────────────────
+
   const alreadyApplied = tournament.applicants.some(
     a => a.player.equals(req.user._id)
   );
@@ -53,44 +67,35 @@ router.patch("/:id/applicants/:uid/accept", isLoggedIn, isOrganiser, async (req,
   applicant.status = "accepted";
   await tournament.save();
 
-  // Add to player's joined list
   await User.findByIdAndUpdate(req.params.uid, {
     $addToSet: { tournamentsJoined: tournament._id }
   });
 
-  // Send email with room details
-  if (applicant.player.email && tournament.roomId) {
+  // Email notification (room details removed — just acceptance notice)
+  if (applicant.player.email) {
     try {
       const transporter = nodemailer.createTransport({
         service: "gmail",
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS
-        }
+        auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
       });
-
       await transporter.sendMail({
         from: `"BattleArena" <${process.env.EMAIL_USER}>`,
         to: applicant.player.email,
         subject: `✅ Accepted: ${tournament.title}`,
         html: `
-          <h2>You're in! 🎮</h2>
-          <p>Your application for <strong>${tournament.title}</strong> has been accepted.</p>
-          <hr/>
-          <p><strong>Room ID:</strong> ${tournament.roomId}</p>
-          <p><strong>Password:</strong> ${tournament.roomPassword}</p>
+          <h2>You're in!</h2>
+          <p>Your registration for <strong>${tournament.title}</strong> has been accepted.</p>
           <p><strong>Start Date:</strong> ${new Date(tournament.startDate).toLocaleString()}</p>
-          <br/>
-          <p>Good luck, warrior! ⚔️</p>
+          <p>Check the tournament page for announcements and match details.</p>
+          <p>Good luck!</p>
         `
       });
     } catch (emailErr) {
       console.log("Email error:", emailErr.message);
-      // Don't block the accept action if email fails
     }
   }
 
-  req.flash("success", "Player accepted! Room details sent via email.");
+  req.flash("success", "Participant accepted!");
   res.redirect(`/tournaments/${req.params.id}`);
 });
 
@@ -117,9 +122,7 @@ router.delete("/:id/withdraw", isLoggedIn, isPlayer, async (req, res) => {
     return res.redirect("/tournaments");
   }
 
-  const app = tournament.applicants.find(
-    a => a.player.equals(req.user._id)
-  );
+  const app = tournament.applicants.find(a => a.player.equals(req.user._id));
 
   if (!app) {
     req.flash("error", "You haven't applied to this tournament.");
