@@ -169,7 +169,9 @@ router.post("/:id/bracket/generate", isLoggedIn, isOrganiser, isTournamentOwner,
 
 router.get("/:id/bracket", async (req, res) => {
   const tournament = await Tournament.findById(req.params.id)
-    .populate("organiser");
+    .populate("organiser")
+    .populate("applicants.player")
+    .populate("winner");
 
   if (!tournament) {
     req.flash("error", "Tournament not found.");

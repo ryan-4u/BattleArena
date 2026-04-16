@@ -14,9 +14,7 @@
       <div class="mb-4" style="border:1px solid rgba(250,204,21,0.4); background:rgba(250,204,21,0.04); padding:24px; position:relative;">
         <div style="position:absolute; top:0; left:0; width:50px; height:2px; background:#facc15;"></div>
         <div style="position:absolute; top:0; right:0; width:50px; height:2px; background:#facc15;"></div>
-        <p style="font-family:'Share Tech Mono',monospace; font-size:0.62rem; color:#facc15; letter-spacing:0.3em; margin-bottom:10px;">
-          🏆 TOURNAMENT CHAMPION
-        </p>
+        <p style="font-family:'Share Tech Mono',monospace; font-size:0.62rem; color:#facc15; letter-spacing:0.3em; margin-bottom:10px;">🏆 TOURNAMENT CHAMPION</p>
         <div class="d-flex align-items-center gap-3">
           <div style="width:52px; height:52px; border-radius:50%; background:rgba(250,204,21,0.15); border:2px solid #facc15; display:flex; align-items:center; justify-content:center; font-family:'Orbitron',monospace; font-size:1.3rem; font-weight:900; color:#facc15;">
             <%= tournament.winner.username.charAt(0).toUpperCase() %>
@@ -26,24 +24,18 @@
               <%= tournament.winner.username %>
             </a>
             <div style="font-family:'Share Tech Mono',monospace; font-size:0.62rem; color:#78716c; letter-spacing:0.15em; margin-top:3px;">
-              BRACKET WINNER · <%= new Date(tournament.winnerDeclaredAt).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) %>
+              WINNER · <%= new Date(tournament.winnerDeclaredAt).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) %>
             </div>
           </div>
         </div>
         <div class="d-flex gap-3 mt-3">
-          <span style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:#22c55e; letter-spacing:0.1em;">
-            ✓ <%= tournament.resultSupports.length %> SUPPORT<%= tournament.resultSupports.length !== 1 ? 'S' : '' %>
-          </span>
-          <span style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:#ef4444; letter-spacing:0.1em;">
-            ⚑ <%= tournament.resultReports.length %> REPORT<%= tournament.resultReports.length !== 1 ? 'S' : '' %>
-          </span>
+          <span style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:#22c55e; letter-spacing:0.1em;">✓ <%= tournament.resultSupports.length %> SUPPORT<%= tournament.resultSupports.length !== 1 ? 'S' : '' %></span>
+          <span style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:#ef4444; letter-spacing:0.1em;">⚑ <%= tournament.resultReports.length %> REPORT<%= tournament.resultReports.length !== 1 ? 'S' : '' %></span>
         </div>
         <% if (isAccepted) { %>
           <div class="d-flex gap-2 mt-3">
             <% if (hasResponded) { %>
-              <span style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:#475569; letter-spacing:0.1em;">
-                You have <%= userResponse %> this result.
-              </span>
+              <span style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:#475569; letter-spacing:0.1em;">You have <%= userResponse %> this result.</span>
             <% } else { %>
               <form action="/tournaments/<%= tournament._id %>/support" method="POST">
                 <button class="btn btn-sm btn-outline-success"><i class="bi bi-hand-thumbs-up"></i> Support Result</button>
@@ -66,11 +58,10 @@
     <% if (tournament.blocked) { %>
       <div class="alert mb-4" style="background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.4); border-left-width:4px; border-radius:0;">
         <div style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:#ef4444; letter-spacing:0.2em; margin-bottom:6px;">⚠ TOURNAMENT BLOCKED BY ADMIN</div>
-        <p style="font-size:0.83rem; color:#fca5a5; margin-bottom:4px;">This tournament has been hidden from public view and players cannot apply.</p>
+        <p style="font-size:0.83rem; color:#fca5a5; margin-bottom:4px;">This tournament has been hidden from public view. Participants cannot register.</p>
         <% if (tournament.blockedReason) { %>
           <p style="font-family:'Share Tech Mono',monospace; font-size:0.72rem; color:#ef4444; margin:0;">REASON: <%= tournament.blockedReason %></p>
         <% } %>
-        <p style="font-size:0.75rem; color:#475569; margin-top:8px; margin-bottom:0;">If you believe this is a mistake, contact the platform admin.</p>
       </div>
     <% } %>
 
@@ -94,7 +85,9 @@
               <i class="bi bi-people"></i> <%= tournament.mode %>
               &nbsp;/&nbsp;
               <i class="bi bi-person-badge"></i>
-              <a href="/profile/<%= tournament.organiser._id %>" style="color:var(--cyber-blue);"><%= tournament.organiser.username %></a>
+              <a href="/profile/<%= tournament.organiser._id %>" style="color:var(--cyber-blue);">
+                <%= tournament.organiser.username %>
+              </a>
             </p>
 
             <p style="color:#94a3b8; font-size:0.9rem; line-height:1.7;"><%= tournament.description %></p>
@@ -118,7 +111,7 @@
               <div class="col-6 col-md-3">
                 <div class="ba-stat-box">
                   <div class="fs-5 fw-bold"><%= tournament.maxPlayers %></div>
-                  <div class="small">Max Players</div>
+                  <div class="small">Max Participants</div>
                 </div>
               </div>
               <div class="col-6 col-md-3">
@@ -138,7 +131,7 @@
                 </span>
               </div>
               <div class="col-md-6">
-                <span style="color:var(--cyber-blue); font-family:'Share Tech Mono',monospace; font-size:0.65rem; letter-spacing:0.15em;">REGISTRATION DEADLINE</span><br/>
+                <span style="color:var(--cyber-blue); font-family:'Share Tech Mono',monospace; font-size:0.65rem; letter-spacing:0.15em;">REGISTRATION CLOSES</span><br/>
                 <span style="color:#94a3b8;">
                   <%= new Date(tournament.registrationDeadline).toLocaleString('en-IN', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) %>
                 </span>
@@ -159,28 +152,67 @@
               </ul>
             <% } %>
 
-            <!-- Room Details — accepted players only -->
-            <% if (isAccepted) { %>
-              <hr/>
-              <div class="alert alert-success mt-2">
-                <p style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; letter-spacing:0.2em; margin-bottom:10px;">ROOM DETAILS</p>
-                <div class="row g-2">
-                  <div class="col-md-6">
-                    <span style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:#86efac; letter-spacing:0.1em;">ROOM ID</span><br/>
-                    <strong style="font-size:1rem; letter-spacing:0.1em;"><%= tournament.roomId || 'Not set yet' %></strong>
-                  </div>
-                  <div class="col-md-6">
-                    <span style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:#86efac; letter-spacing:0.1em;">PASSWORD</span><br/>
-                    <strong style="font-size:1rem; letter-spacing:0.1em;"><%= tournament.roomPassword || 'Not set yet' %></strong>
-                  </div>
-                </div>
-              </div>
-            <% } %>
-
           </div>
         </div>
 
-        <!-- View Bracket button — visible to everyone once generated -->
+        <!-- Announcements — visible to accepted players + organiser -->
+        <%
+          const isOrgView = currUser && tournament.organiser._id.equals(currUser._id);
+          const canSeeAnnouncements = isOrgView || isAccepted;
+        %>
+        <% if (canSeeAnnouncements && (tournament.announcements.length > 0 || isOrgView)) { %>
+          <div class="card ba-card mb-4" style="border-color:rgba(250,204,21,0.2);">
+            <div class="card-body p-4">
+              <p style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:#facc15; letter-spacing:0.2em; margin-bottom:16px;">
+                📢 ANNOUNCEMENTS
+              </p>
+
+              <!-- Organiser: post new announcement -->
+              <% if (isOrgView) { %>
+                <form action="/tournaments/<%= tournament._id %>/announcements" method="POST" class="mb-4">
+                  <div class="d-flex gap-2">
+                    <input type="text" name="text" class="form-control"
+                      placeholder="Post an update, schedule change, or important note..."
+                      required maxlength="500"/>
+                    <button type="submit" class="btn btn-warning fw-bold px-3" style="white-space:nowrap;">
+                      <i class="bi bi-megaphone"></i> Post
+                    </button>
+                  </div>
+                </form>
+              <% } %>
+
+              <!-- Announcements list -->
+              <% if (tournament.announcements.length === 0) { %>
+                <p style="font-size:0.82rem; color:#475569; margin:0;">No announcements yet.</p>
+              <% } else { %>
+                <% tournament.announcements.forEach(ann => { %>
+                  <div class="d-flex justify-content-between align-items-start mb-3 pb-3"
+                    style="border-bottom:1px solid rgba(250,204,21,0.08);">
+                    <div>
+                      <p style="font-size:0.88rem; color:#e2e8f0; margin-bottom:4px; line-height:1.6;">
+                        <%= ann.text %>
+                      </p>
+                      <span style="font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:#475569; letter-spacing:0.1em;">
+                        <%= new Date(ann.postedAt).toLocaleString('en-IN', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }) %>
+                      </span>
+                    </div>
+                    <% if (isOrgView) { %>
+                      <form action="/tournaments/<%= tournament._id %>/announcements/<%= ann._id %>?_method=DELETE"
+                        method="POST" class="ms-3 flex-shrink-0"
+                        onsubmit="return confirm('Remove this announcement?')">
+                        <button type="submit" class="btn btn-outline-danger btn-sm" style="font-size:0.7rem; padding:2px 8px;">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      </form>
+                    <% } %>
+                  </div>
+                <% }) %>
+              <% } %>
+            </div>
+          </div>
+        <% } %>
+
+        <!-- View Bracket button -->
         <% if (tournament.bracketGenerated) { %>
           <div class="mb-4">
             <a href="/tournaments/<%= tournament._id %>/bracket" class="btn btn-warning fw-bold px-4 py-2">
@@ -201,41 +233,7 @@
             </form>
           </div>
 
-          <!-- Room Details Update -->
-          <div class="card ba-card mb-4">
-            <div class="card-body p-4">
-              <p style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:var(--cyber-blue); letter-spacing:0.2em; margin-bottom:16px;">// ROOM DETAILS</p>
-              <% if (tournament.roomId || tournament.roomPassword) { %>
-                <div class="row g-2 mb-4">
-                  <div class="col-md-6">
-                    <span style="font-family:'Share Tech Mono',monospace; font-size:0.62rem; color:#475569; letter-spacing:0.15em;">CURRENT ROOM ID</span>
-                    <div style="font-size:1rem; font-weight:700; color:var(--cyber-blue); letter-spacing:0.1em; margin-top:4px;"><%= tournament.roomId || '—' %></div>
-                  </div>
-                  <div class="col-md-6">
-                    <span style="font-family:'Share Tech Mono',monospace; font-size:0.62rem; color:#475569; letter-spacing:0.15em;">CURRENT PASSWORD</span>
-                    <div style="font-size:1rem; font-weight:700; color:var(--cyber-blue); letter-spacing:0.1em; margin-top:4px;"><%= tournament.roomPassword || '—' %></div>
-                  </div>
-                </div>
-              <% } else { %>
-                <p style="font-size:0.8rem; color:#475569; margin-bottom:16px;">No room details set yet. Add them below so accepted players can join.</p>
-              <% } %>
-              <form action="/tournaments/<%= tournament._id %>/room?_method=PATCH" method="POST">
-                <div class="row g-2">
-                  <div class="col-md-5">
-                    <input type="text" name="roomId" class="form-control" placeholder="Room ID" value="<%= tournament.roomId || '' %>" required/>
-                  </div>
-                  <div class="col-md-5">
-                    <input type="text" name="roomPassword" class="form-control" placeholder="Room Password" value="<%= tournament.roomPassword || '' %>" required/>
-                  </div>
-                  <div class="col-md-2">
-                    <button type="submit" class="btn btn-warning w-100"><i class="bi bi-save"></i> Save</button>
-                  </div>
-                </div>
-              </form>
-            </div>
-          </div>
-
-          <!-- Bracket Section — replaces manual declare winner -->
+          <!-- Bracket Section -->
           <% if (tournament.status === 'ongoing') { %>
             <% const acceptedPlayers = tournament.applicants.filter(a => a.status === 'accepted'); %>
             <div class="card ba-card mb-4" style="border-color:rgba(56,189,248,0.2);">
@@ -249,15 +247,14 @@
                       const prelimCount = n - mainSize;
                     %>
                     <p style="font-size:0.8rem; color:#475569; margin-bottom:6px;">
-                      <strong style="color:#94a3b8;"><%= acceptedPlayers.length %></strong> players accepted.
+                      <strong style="color:#94a3b8;"><%= acceptedPlayers.length %></strong> participants accepted.
                       <% if (prelimCount > 0) { %>
-                        <strong style="color:#f97316;"><%= prelimCount * 2 %></strong> will play in prelims,
-                        <strong style="color:#94a3b8;"><%= mainSize - prelimCount %></strong> get byes into Round 1.
+                        <strong style="color:#f97316;"><%= prelimCount * 2 %></strong> will play a qualifying round first.
                       <% } else { %>
-                        Perfect power of 2 — no prelim round needed.
+                        Clean draw — no qualifying round needed.
                       <% } %>
                     </p>
-                    <p style="font-size:0.75rem; color:#475569; margin-bottom:16px;">Prelim spots go to the last registered players. This action is permanent.</p>
+                    <p style="font-size:0.75rem; color:#475569; margin-bottom:16px;">This action is permanent and cannot be undone.</p>
                     <form action="/tournaments/<%= tournament._id %>/bracket/generate" method="POST"
                       onsubmit="return confirm('Generate bracket? This cannot be undone.')">
                       <button type="submit" class="btn btn-warning fw-bold px-4">
@@ -265,7 +262,7 @@
                       </button>
                     </form>
                   <% } else { %>
-                    <p style="font-size:0.8rem; color:#475569; margin-bottom:0;">Accept at least <strong>2 players</strong> before generating the bracket.</p>
+                    <p style="font-size:0.8rem; color:#475569; margin-bottom:0;">Accept at least <strong>2 participants</strong> before generating the bracket.</p>
                   <% } %>
                 <% } else { %>
                   <p style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:#22c55e; letter-spacing:0.2em; margin-bottom:10px;">✓ BRACKET ACTIVE</p>
@@ -289,41 +286,42 @@
             <% if (tournament.status === 'completed') { %>
               <div class="alert alert-info"><i class="bi bi-flag-fill"></i> This tournament has ended.</div>
             <% } else if (tournament.blocked) { %>
-              <div class="alert alert-danger"><i class="bi bi-slash-circle"></i> Applications are currently closed for this tournament.</div>
+              <div class="alert alert-danger"><i class="bi bi-slash-circle"></i> Registration is closed for this tournament.</div>
             <% } else if (tournament.bracketGenerated) { %>
-              <div class="alert alert-info"><i class="bi bi-diagram-3"></i> Bracket has already been generated. Registration is closed.</div>
+              <div class="alert alert-info"><i class="bi bi-diagram-3"></i> The bracket has been drawn. Registration is now closed.</div>
             <% } else { %>
               <form action="/tournaments/<%= tournament._id %>/apply" method="POST">
-                <button class="btn btn-warning fw-bold px-4 py-2"><i class="bi bi-send"></i> Apply to Join</button>
+                <button class="btn btn-warning fw-bold px-4 py-2"><i class="bi bi-send"></i> Register / Apply</button>
               </form>
             <% } %>
           <% } else if (myApp.status === 'pending') { %>
             <div class="alert alert-info d-flex justify-content-between align-items-center">
-              <span><i class="bi bi-hourglass-split"></i> Your application is <strong>pending</strong> — waiting for organiser review.</span>
+              <span><i class="bi bi-hourglass-split"></i> Your registration is <strong>pending</strong> — waiting for organiser review.</span>
               <form action="/tournaments/<%= tournament._id %>/withdraw?_method=DELETE" method="POST"
-                onsubmit="return confirm('Withdraw your application?')">
+                onsubmit="return confirm('Withdraw your registration?')">
                 <button class="btn btn-outline-danger btn-sm ms-3"><i class="bi bi-x-circle"></i> Withdraw</button>
               </form>
             </div>
           <% } else if (myApp.status === 'accepted') { %>
             <div class="alert alert-success d-flex justify-content-between align-items-center flex-wrap gap-2">
-              <span><i class="bi bi-check-circle-fill"></i> You've been <strong>accepted</strong>! Room details are shown above.</span>
+              <span><i class="bi bi-check-circle-fill"></i> You're <strong>confirmed</strong>! Check announcements above for match details.</span>
               <% if (tournament.bracketGenerated) { %>
                 <a href="/tournaments/<%= tournament._id %>/bracket" class="btn btn-warning btn-sm fw-bold">
-                  <i class="bi bi-diagram-3-fill"></i> View Your Matches
+                  <i class="bi bi-diagram-3-fill"></i> View My Matches
                 </a>
               <% } %>
             </div>
           <% } else { %>
-            <div class="alert alert-danger"><i class="bi bi-x-circle-fill"></i> Your application was <strong>rejected</strong>.</div>
+            <div class="alert alert-danger"><i class="bi bi-x-circle-fill"></i> Your registration was <strong>not accepted</strong>.</div>
           <% } %>
         <% } %>
 
         <% if (!currUser) { %>
           <div class="alert alert-info">
-            <a href="/login" style="color:var(--cyber-blue);">Login</a> to apply for this tournament.
+            <a href="/login" style="color:var(--cyber-blue);">Login</a> to register for this tournament.
           </div>
         <% } %>
+
       </div>
 
       <!-- APPLICANTS PANEL — organiser only -->
@@ -332,10 +330,10 @@
           <div class="card shadow border-0 ba-card">
             <div class="card-body p-3">
               <p style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:var(--cyber-blue); letter-spacing:0.2em; margin-bottom:14px;">
-                APPLICANTS (<%= tournament.applicants.length %>)
+                PARTICIPANTS (<%= tournament.applicants.length %>)
               </p>
               <% if (tournament.applicants.length === 0) { %>
-                <p class="text-muted small">No applications yet.</p>
+                <p class="text-muted small">No registrations yet.</p>
               <% } else { %>
                 <% const pending  = tournament.applicants.filter(a => a.status === 'pending'); %>
                 <% const accepted = tournament.applicants.filter(a => a.status === 'accepted'); %>
@@ -348,7 +346,7 @@
                       <div class="d-flex justify-content-between align-items-center">
                         <div>
                           <a href="/profile/<%= app.player._id %>" style="font-size:0.85rem; font-weight:600; color:var(--cyber-text); text-decoration:none;"><%= app.player.username %></a>
-                          <div style="font-size:0.7rem; color:#475569;"><%= app.player.gameUsername || 'No IGN set' %></div>
+                          <div style="font-size:0.7rem; color:#475569;"><%= app.player.gameUsername || 'No username set' %></div>
                         </div>
                         <% if (!tournament.bracketGenerated) { %>
                           <div class="d-flex flex-column gap-1">
@@ -373,19 +371,19 @@
                     <div class="d-flex justify-content-between align-items-center mb-2">
                       <div>
                         <a href="/profile/<%= app.player._id %>" style="font-size:0.82rem; font-weight:600; color:#86efac; text-decoration:none;"><%= app.player.username %></a>
-                        <div style="font-size:0.68rem; color:#475569;"><%= app.player.gameUsername || 'No IGN' %></div>
+                        <div style="font-size:0.68rem; color:#475569;"><%= app.player.gameUsername || 'No username' %></div>
                       </div>
-                      <span class="badge bg-success">ACCEPTED</span>
+                      <span class="badge bg-success">CONFIRMED</span>
                     </div>
                   <% }) %>
                 <% } %>
 
                 <% if (rejected.length > 0) { %>
-                  <p style="font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:#475569; letter-spacing:0.15em; margin: 12px 0 8px;">REJECTED (<%= rejected.length %>)</p>
+                  <p style="font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:#475569; letter-spacing:0.15em; margin: 12px 0 8px;">NOT ACCEPTED (<%= rejected.length %>)</p>
                   <% rejected.forEach(app => { %>
                     <div class="d-flex justify-content-between align-items-center mb-2">
                       <a href="/profile/<%= app.player._id %>" style="font-size:0.82rem; color:#475569; text-decoration:none;"><%= app.player.username %></a>
-                      <span class="badge bg-danger">REJECTED</span>
+                      <span class="badge bg-danger">NOT ACCEPTED</span>
                     </div>
                   <% }) %>
                 <% } %>
@@ -408,9 +406,10 @@
         </div>
         <form action="/tournaments/<%= tournament._id %>/report" method="POST">
           <div class="modal-body">
-            <p style="font-size:0.82rem; color:#94a3b8; margin-bottom:14px;">Tell us why you believe this result is wrong.</p>
+            <p style="font-size:0.82rem; color:#94a3b8; margin-bottom:14px;">Tell us why you believe the result is incorrect.</p>
             <label class="form-label fw-semibold" style="font-size:0.78rem;">Reason</label>
-            <textarea name="reason" class="form-control" rows="3" placeholder="e.g. Wrong winner declared, match never happened..."></textarea>
+            <textarea name="reason" class="form-control" rows="3"
+              placeholder="e.g. Wrong winner declared, match didn't take place..."></textarea>
           </div>
           <div class="modal-footer" style="border-top:1px solid rgba(239,68,68,0.15);">
             <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>

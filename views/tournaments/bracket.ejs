@@ -122,7 +122,29 @@
         </span>
       </div>
       <hr class="mt-3 mb-4"/>
-
+      <!-- Announcements — accepted players + organiser only -->
+      <%
+        const bracketIsOrg = currUser && tournament.organiser._id.equals(currUser._id);
+        const bracketIsAccepted = !bracketIsOrg && currUser && tournament.applicants.some(
+          a => a.player && a.player._id && a.player._id.equals(currUser._id) && a.status === 'accepted'
+        );
+        const showAnnouncements = bracketIsOrg || bracketIsAccepted;
+      %>
+      <% if (showAnnouncements && tournament.announcements && tournament.announcements.length > 0) { %>
+        <div class="mx-3 mb-4" style="border:1px solid rgba(250,204,21,0.2); background:rgba(250,204,21,0.02); padding:20px;">
+          <p style="font-family:'Share Tech Mono',monospace; font-size:0.62rem; color:#facc15; letter-spacing:0.25em; margin-bottom:14px;">
+            📢 ANNOUNCEMENTS
+          </p>
+          <% tournament.announcements.forEach(ann => { %>
+            <div class="mb-3 pb-3" style="border-bottom:1px solid rgba(250,204,21,0.07);">
+              <p style="font-size:0.85rem; color:#e2e8f0; margin-bottom:4px; line-height:1.6;"><%= ann.text %></p>
+              <span style="font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:#475569; letter-spacing:0.1em;">
+                <%= new Date(ann.postedAt).toLocaleString('en-IN', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }) %>
+              </span>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
       <%
         const allMatches = orderedRounds.flatMap(r => r.matches);
         const confirmedCount = allMatches.filter(m => m.status === 'confirmed').length;

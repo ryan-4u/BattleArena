@@ -7,7 +7,6 @@ const { isLoggedIn, isOrganiser, isTournamentOwner } = require("../middleware");
 // INDEX
 router.get("/", async (req, res) => {
   const { search, game, status } = req.query;
-  
   let filter = { blocked: false };
   if (search) filter.title = { $regex: search, $options: "i" };
   if (game)   filter.game  = { $regex: game,   $options: "i" };
@@ -30,14 +29,7 @@ router.get("/", async (req, res) => {
       }
     },
     { $sort: { statusOrder: 1, startDate: 1 } },
-    {
-      $lookup: {
-        from: "users",
-        localField: "organiser",
-        foreignField: "_id",
-        as: "organiser"
-      }
-    },
+    { $lookup: { from: "users", localField: "organiser", foreignField: "_id", as: "organiser" } },
     { $unwind: "$organiser" }
   ]);
 
@@ -76,7 +68,6 @@ router.get("/:id", async (req, res) => {
     return res.redirect("/tournaments");
   }
 
-  // If blocked and viewer is not organiser or admin — deny access
   if (tournament.blocked) {
     const isOwner = req.user && tournament.organiser._id.equals(req.user._id);
     const isAdmin = req.user && req.user.role === "admin";
@@ -88,7 +79,7 @@ router.get("/:id", async (req, res) => {
 
   let isAccepted = false;
   let hasResponded = false;
-  let userResponse = null; // 'supported' or 'reported'
+  let userResponse = null;
 
   if (req.user) {
     const entry = tournament.applicants.find(
@@ -97,23 +88,14 @@ router.get("/:id", async (req, res) => {
     isAccepted = !!entry;
 
     if (isAccepted) {
-      const supported = tournament.resultSupports.some(
-        id => id.equals(req.user._id)
-      );
-      const reported = tournament.resultReports.some(
-        r => r.user.equals(req.user._id)
-      );
+      const supported = tournament.resultSupports.some(id => id.equals(req.user._id));
+      const reported  = tournament.resultReports.some(r => r.user.equals(req.user._id));
       if (supported) { hasResponded = true; userResponse = "supported"; }
       if (reported)  { hasResponded = true; userResponse = "reported"; }
     }
   }
 
-  res.render("tournaments/show", {
-    tournament,
-    isAccepted,
-    hasResponded,
-    userResponse
-  });
+  res.render("tournaments/show", { tournament, isAccepted, hasResponded, userResponse });
 });
 
 // EDIT
@@ -136,148 +118,84 @@ router.delete("/:id", isLoggedIn, isOrganiser, isTournamentOwner, async (req, re
   res.redirect("/tournaments");
 });
 
-// Update room details (organiser only)
-router.patch("/:id/room", isLoggedIn, isOrganiser, isTournamentOwner, async (req, res) => {
-  const { roomId, roomPassword } = req.body;
+// ── ANNOUNCEMENTS ──────────────────────────────────────────────────────────────
 
-  if (!roomId || !roomPassword) {
-    req.flash("error", "Both Room ID and Password are required.");
+// POST — organiser posts a new announcement
+router.post("/:id/announcements", isLoggedIn, isOrganiser, isTournamentOwner, async (req, res) => {
+  const { text } = req.body;
+  if (!text || !text.trim()) {
+    req.flash("error", "Announcement cannot be empty.");
     return res.redirect(`/tournaments/${req.params.id}`);
   }
-
   await Tournament.findByIdAndUpdate(req.params.id, {
-    roomId:       roomId.trim(),
-    roomPassword: roomPassword.trim()
+    $push: { announcements: { $each: [{ text: text.trim() }], $position: 0 } }
   });
-
-  req.flash("success", "Room details updated. Accepted players can now see them.");
+  req.flash("success", "Announcement posted.");
   res.redirect(`/tournaments/${req.params.id}`);
 });
 
-// Declare winner — organiser only, ongoing tournaments
+// DELETE — organiser deletes an announcement
+router.delete("/:id/announcements/:annId", isLoggedIn, isOrganiser, isTournamentOwner, async (req, res) => {
+  await Tournament.findByIdAndUpdate(req.params.id, {
+    $pull: { announcements: { _id: req.params.annId } }
+  });
+  req.flash("success", "Announcement removed.");
+  res.redirect(`/tournaments/${req.params.id}`);
+});
+
+// ── RESULT ACTIONS ─────────────────────────────────────────────────────────────
+
+// Declare winner
 router.patch("/:id/declare-winner", isLoggedIn, isOrganiser, isTournamentOwner, async (req, res) => {
   const { winnerId } = req.body;
-
-  if (!winnerId) {
-    req.flash("error", "Please select a winner.");
-    return res.redirect(`/tournaments/${req.params.id}`);
-  }
+  if (!winnerId) { req.flash("error", "Please select a winner."); return res.redirect(`/tournaments/${req.params.id}`); }
 
   const tournament = await Tournament.findById(req.params.id);
+  if (!tournament) { req.flash("error", "Tournament not found."); return res.redirect("/tournaments"); }
+  if (tournament.status === "completed") { req.flash("error", "Winner already declared."); return res.redirect(`/tournaments/${req.params.id}`); }
 
-  if (!tournament) {
-    req.flash("error", "Tournament not found.");
-    return res.redirect("/tournaments");
-  }
+  const isAcceptedPlayer = tournament.applicants.some(a => a.player.equals(winnerId) && a.status === "accepted");
+  if (!isAcceptedPlayer) { req.flash("error", "Selected winner must be an accepted participant."); return res.redirect(`/tournaments/${req.params.id}`); }
 
-  if (tournament.status === "completed") {
-    req.flash("error", "Winner has already been declared.");
-    return res.redirect(`/tournaments/${req.params.id}`);
-  }
+  await Tournament.findByIdAndUpdate(req.params.id, {
+    $set: { winner: winnerId, winnerDeclaredAt: new Date(), status: "completed" }
+  }, { new: true });
 
-  const isAcceptedPlayer = tournament.applicants.some(
-    a => a.player.equals(winnerId) && a.status === "accepted"
-  );
-
-  if (!isAcceptedPlayer) {
-    req.flash("error", "Selected winner must be an accepted participant.");
-    return res.redirect(`/tournaments/${req.params.id}`);
-  }
-
-  const updated = await Tournament.findByIdAndUpdate(
-    req.params.id,
-    {
-      $set: {
-        winner: winnerId,
-        winnerDeclaredAt: new Date(),
-        status: "completed"
-      }
-    },
-    { new: true }
-  );
-
-  await User.findByIdAndUpdate(winnerId, {
-    $addToSet: { tournamentsWon: tournament._id }
-  });
-
+  await User.findByIdAndUpdate(winnerId, { $addToSet: { tournamentsWon: tournament._id } });
   req.flash("success", "Winner declared! Tournament is now completed.");
   res.redirect(`/tournaments/${req.params.id}`);
 });
 
-// Support result — accepted players only
+// Support result
 router.post("/:id/support", isLoggedIn, async (req, res) => {
   const tournament = await Tournament.findById(req.params.id);
+  if (!tournament || tournament.status !== "completed") { req.flash("error", "Tournament not found or not completed."); return res.redirect("/tournaments"); }
 
-  if (!tournament || tournament.status !== "completed") {
-    req.flash("error", "Tournament not found or not completed.");
-    return res.redirect("/tournaments");
-  }
+  const isAcceptedPlayer = tournament.applicants.some(a => a.player.equals(req.user._id) && a.status === "accepted");
+  if (!isAcceptedPlayer) { req.flash("error", "Only accepted participants can support the result."); return res.redirect(`/tournaments/${req.params.id}`); }
 
-  const isAcceptedPlayer = tournament.applicants.some(
-    a => a.player.equals(req.user._id) && a.status === "accepted"
-  );
+  const alreadyDone = tournament.resultSupports.some(id => id.equals(req.user._id)) || tournament.resultReports.some(r => r.user.equals(req.user._id));
+  if (alreadyDone) { req.flash("error", "You have already responded to this result."); return res.redirect(`/tournaments/${req.params.id}`); }
 
-  if (!isAcceptedPlayer) {
-    req.flash("error", "Only accepted participants can support the result.");
-    return res.redirect(`/tournaments/${req.params.id}`);
-  }
-
-  const alreadySupported = tournament.resultSupports.some(
-    id => id.equals(req.user._id)
-  );
-  const alreadyReported = tournament.resultReports.some(
-    r => r.user.equals(req.user._id)
-  );
-
-  if (alreadySupported || alreadyReported) {
-    req.flash("error", "You have already responded to this result.");
-    return res.redirect(`/tournaments/${req.params.id}`);
-  }
-
-  await Tournament.findByIdAndUpdate(req.params.id, {
-    $push: { resultSupports: req.user._id }
-  });
-
+  await Tournament.findByIdAndUpdate(req.params.id, { $push: { resultSupports: req.user._id } });
   req.flash("success", "You have supported the result.");
   res.redirect(`/tournaments/${req.params.id}`);
 });
 
-// Report result — accepted players only
+// Report result
 router.post("/:id/report", isLoggedIn, async (req, res) => {
   const { reason } = req.body;
   const tournament = await Tournament.findById(req.params.id);
+  if (!tournament || tournament.status !== "completed") { req.flash("error", "Tournament not found or not completed."); return res.redirect("/tournaments"); }
 
-  if (!tournament || tournament.status !== "completed") {
-    req.flash("error", "Tournament not found or not completed.");
-    return res.redirect("/tournaments");
-  }
+  const isAcceptedPlayer = tournament.applicants.some(a => a.player.equals(req.user._id) && a.status === "accepted");
+  if (!isAcceptedPlayer) { req.flash("error", "Only accepted participants can report the result."); return res.redirect(`/tournaments/${req.params.id}`); }
 
-  const isAcceptedPlayer = tournament.applicants.some(
-    a => a.player.equals(req.user._id) && a.status === "accepted"
-  );
+  const alreadyDone = tournament.resultSupports.some(id => id.equals(req.user._id)) || tournament.resultReports.some(r => r.user.equals(req.user._id));
+  if (alreadyDone) { req.flash("error", "You have already responded to this result."); return res.redirect(`/tournaments/${req.params.id}`); }
 
-  if (!isAcceptedPlayer) {
-    req.flash("error", "Only accepted participants can report the result.");
-    return res.redirect(`/tournaments/${req.params.id}`);
-  }
-
-  const alreadySupported = tournament.resultSupports.some(
-    id => id.equals(req.user._id)
-  );
-  const alreadyReported = tournament.resultReports.some(
-    r => r.user.equals(req.user._id)
-  );
-
-  if (alreadySupported || alreadyReported) {
-    req.flash("error", "You have already responded to this result.");
-    return res.redirect(`/tournaments/${req.params.id}`);
-  }
-
-  await Tournament.findByIdAndUpdate(req.params.id, {
-    $push: { resultReports: { user: req.user._id, reason: reason || "" } }
-  });
-
-  req.flash("success", "Result reported. Admin will review if enough reports are received.");
+  await Tournament.findByIdAndUpdate(req.params.id, { $push: { resultReports: { user: req.user._id, reason: reason || "" } } });
+  req.flash("success", "Result reported. Admin will review.");
   res.redirect(`/tournaments/${req.params.id}`);
 });
 

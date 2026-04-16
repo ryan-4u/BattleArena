@@ -16,49 +16,75 @@
 
             <form action="/tournaments" method="POST" id="tournamentForm" novalidate>
 
+              <!-- Title -->
               <div class="mb-3">
                 <label class="form-label fw-semibold">Tournament Title</label>
                 <input type="text" name="tournament[title]" class="form-control" id="title"
-                  placeholder="e.g. Valorant Pro League S1" required minlength="3"/>
+                  placeholder="e.g. City Chess Open 2025, Valorant Pro League S1" required minlength="3"/>
                 <div class="invalid-feedback">Title must be at least 3 characters.</div>
               </div>
 
+              <!-- Sport Category -->
               <div class="row g-3 mb-3">
                 <div class="col-md-6">
-                  <label class="form-label fw-semibold">Game</label>
-                  <input type="text" name="tournament[game]" class="form-control" id="game"
-                    placeholder="e.g. BGMI, Valorant, Free Fire" required/>
-                  <div class="invalid-feedback">Please enter the game name.</div>
+                  <label class="form-label fw-semibold">Sport / Game Category</label>
+                  <select name="tournament[sportCategory]" class="form-select" id="sportCategory" required>
+                    <option value="">-- Select Category --</option>
+                    <option value="battle-royale">Battle Royale (BGMI, Free Fire, PUBG)</option>
+                    <option value="fps-shooter">FPS / Shooter (Valorant, CS2)</option>
+                    <option value="chess">Chess</option>
+                    <option value="badminton">Badminton</option>
+                    <option value="coding">Coding / Hackathon</option>
+                    <option value="offline-sport">Offline Sport (Football, Cricket, etc.)</option>
+                    <option value="other">Other</option>
+                  </select>
+                  <div class="invalid-feedback">Please select a category.</div>
                 </div>
                 <div class="col-md-6">
-                  <label class="form-label fw-semibold">Mode</label>
-                  <select name="tournament[mode]" class="form-select" id="mode" required>
-                    <option value="">-- Select Mode --</option>
-                    <option value="Solo">Solo</option>
-                    <option value="Duo">Duo</option>
-                    <option value="Squad">Squad</option>
-                  </select>
-                  <div class="invalid-feedback">Please select a mode.</div>
+                  <label class="form-label fw-semibold">
+                    Game / Sport Name
+                    <span class="text-muted fw-normal" style="font-size:0.75rem; font-family:'DM Sans'; text-transform:none; letter-spacing:0;">
+                      (specific name)
+                    </span>
+                  </label>
+                  <input type="text" name="tournament[game]" class="form-control" id="game"
+                    placeholder="e.g. Chess, BGMI, Badminton, LeetCode" required/>
+                  <div class="invalid-feedback">Please enter the game or sport name.</div>
                 </div>
               </div>
 
+              <!-- Format / Mode -->
+              <div class="mb-3">
+                <label class="form-label fw-semibold">
+                  Participation Format
+                  <span class="text-muted fw-normal" style="font-size:0.75rem; font-family:'DM Sans'; text-transform:none; letter-spacing:0;">
+                    (select category first)
+                  </span>
+                </label>
+                <select name="tournament[mode]" class="form-select" id="mode" required>
+                  <option value="">-- Select Category First --</option>
+                </select>
+                <div class="invalid-feedback">Please select a participation format.</div>
+              </div>
+
+              <!-- Description -->
               <div class="mb-3">
                 <label class="form-label fw-semibold">Description</label>
                 <textarea name="tournament[description]" class="form-control" id="description"
                   rows="3" required minlength="10"
-                  placeholder="Describe the tournament format, eligibility, and what to expect..."></textarea>
+                  placeholder="Describe the tournament format, who can join, what to expect..."></textarea>
                 <div class="invalid-feedback">Description must be at least 10 characters.</div>
               </div>
 
+              <!-- Rules -->
               <div class="mb-3">
                 <label class="form-label fw-semibold">Rules</label>
                 <div id="rulesContainer">
                   <div class="rule-item d-flex gap-2 mb-2">
                     <span class="rule-number cyber-tag-line pt-2">01.</span>
                     <input type="text" class="form-control rule-input"
-                      placeholder="e.g. No hacking or third-party tools"/>
-                    <button type="button" class="btn btn-outline-danger btn-sm remove-rule"
-                      style="display:none;">
+                      placeholder="e.g. No cheating or unsportsmanlike conduct"/>
+                    <button type="button" class="btn btn-outline-danger btn-sm remove-rule" style="display:none;">
                       <i class="bi bi-x"></i>
                     </button>
                   </div>
@@ -70,11 +96,12 @@
                 <div class="text-danger small mt-1" id="rulesError" style="display:none;"></div>
               </div>
 
+              <!-- Prize + Entry Fee -->
               <div class="row g-3 mb-3">
                 <div class="col-md-6">
                   <label class="form-label fw-semibold">Prize Pool</label>
                   <input type="text" name="tournament[prizePool]" class="form-control"
-                    placeholder="e.g. ₹5000 or No Prize"/>
+                    placeholder="e.g. ₹5000 Cash, Trophy, No Prize"/>
                 </div>
                 <div class="col-md-6">
                   <label class="form-label fw-semibold">Entry Fee (₹)</label>
@@ -84,52 +111,36 @@
                 </div>
               </div>
 
+              <!-- Max Players + Dates -->
               <div class="row g-3 mb-3">
                 <div class="col-md-4">
-                  <label class="form-label fw-semibold">Max Players</label>
+                  <label class="form-label fw-semibold">Max Participants</label>
                   <input type="number" name="tournament[maxPlayers]" class="form-control"
-                    id="maxPlayers" min="2" max="500" required/>
-                  <div class="invalid-feedback">Min 2, max 500 players.</div>
+                    id="maxPlayers" min="2" max="500" required
+                    placeholder="e.g. 16, 32, 64"/>
+                  <div class="invalid-feedback">Min 2, max 500 participants.</div>
                 </div>
                 <div class="col-md-4">
-                  <label class="form-label fw-semibold">Start Date</label>
+                  <label class="form-label fw-semibold">Start Date & Time</label>
                   <input type="datetime-local" name="tournament[startDate]"
                     class="form-control" id="startDate" required/>
                   <div class="invalid-feedback">Start date must be in the future.</div>
                 </div>
                 <div class="col-md-4">
-                  <label class="form-label fw-semibold">Registration Deadline</label>
+                  <label class="form-label fw-semibold">Registration Closes</label>
                   <input type="datetime-local" name="tournament[registrationDeadline]"
                     class="form-control" id="regDeadline" required/>
                   <div class="invalid-feedback">Deadline must be before the start date.</div>
                 </div>
               </div>
 
-              <div class="row g-3 mb-3">
-                <div class="col-md-6">
-                  <label class="form-label fw-semibold">
-                    Room ID
-                    <span class="text-muted fw-normal"
-                      style="font-family:'DM Sans'; font-size:0.75rem; text-transform:none; letter-spacing:0;">
-                      (visible only to accepted players)
-                    </span>
-                  </label>
-                  <input type="text" name="tournament[roomId]" class="form-control"
-                    placeholder="Can be set later"/>
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label fw-semibold">Room Password</label>
-                  <input type="text" name="tournament[roomPassword]" class="form-control"
-                    placeholder="Can be set later"/>
-                </div>
-              </div>
-
+              <!-- Status -->
               <div class="mb-4">
-                <label class="form-label fw-semibold">Status</label>
+                <label class="form-label fw-semibold">Initial Status</label>
                 <select name="tournament[status]" class="form-select">
-                  <option value="upcoming">Upcoming</option>
-                  <option value="ongoing">Ongoing</option>
-                  <option value="completed">Completed</option>
+                  <option value="upcoming">Upcoming — Open for registration</option>
+                  <option value="ongoing">Ongoing — Currently in progress</option>
+                  <option value="completed">Completed — Tournament finished</option>
                 </select>
               </div>
 

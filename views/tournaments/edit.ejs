@@ -14,42 +14,58 @@
           <div class="card-body p-4">
             <h3 class="fw-bold mb-4"><i class="bi bi-pencil-square text-warning"></i> Edit Tournament</h3>
 
-            <form action="/tournaments/<%= tournament._id %>?_method=PUT" method="POST"
-              id="editForm" novalidate>
+            <form action="/tournaments/<%= tournament._id %>?_method=PUT" method="POST" id="editForm" novalidate>
 
+              <!-- Title -->
               <div class="mb-3">
                 <label class="form-label fw-semibold">Tournament Title</label>
-                <input type="text" name="tournament[title]" class="form-control" id="title"
+                <input type="text" name="tournament[title]" class="form-control"
                   value="<%= tournament.title %>" required minlength="3"/>
                 <div class="invalid-feedback">Title must be at least 3 characters.</div>
               </div>
 
+              <!-- Sport Category + Game Name -->
               <div class="row g-3 mb-3">
                 <div class="col-md-6">
-                  <label class="form-label fw-semibold">Game</label>
-                  <input type="text" name="tournament[game]" class="form-control" id="game"
-                    value="<%= tournament.game %>" required/>
-                  <div class="invalid-feedback">Please enter the game name.</div>
+                  <label class="form-label fw-semibold">Sport / Game Category</label>
+                  <select name="tournament[sportCategory]" class="form-select" id="sportCategory" required>
+                    <option value="">-- Select Category --</option>
+                    <option value="battle-royale" <%= tournament.sportCategory === 'battle-royale' ? 'selected' : '' %>>Battle Royale (BGMI, Free Fire, PUBG)</option>
+                    <option value="fps-shooter"   <%= tournament.sportCategory === 'fps-shooter'   ? 'selected' : '' %>>FPS / Shooter (Valorant, CS2)</option>
+                    <option value="chess"          <%= tournament.sportCategory === 'chess'          ? 'selected' : '' %>>Chess</option>
+                    <option value="badminton"      <%= tournament.sportCategory === 'badminton'      ? 'selected' : '' %>>Badminton</option>
+                    <option value="coding"         <%= tournament.sportCategory === 'coding'         ? 'selected' : '' %>>Coding / Hackathon</option>
+                    <option value="offline-sport"  <%= tournament.sportCategory === 'offline-sport'  ? 'selected' : '' %>>Offline Sport (Football, Cricket, etc.)</option>
+                    <option value="other"          <%= tournament.sportCategory === 'other'          ? 'selected' : '' %>>Other</option>
+                  </select>
                 </div>
                 <div class="col-md-6">
-                  <label class="form-label fw-semibold">Mode</label>
-                  <select name="tournament[mode]" class="form-select" id="mode" required>
-                    <option value="">-- Select Mode --</option>
-                    <option value="Solo"  <%= tournament.mode === 'Solo'  ? 'selected' : '' %>>Solo</option>
-                    <option value="Duo"   <%= tournament.mode === 'Duo'   ? 'selected' : '' %>>Duo</option>
-                    <option value="Squad" <%= tournament.mode === 'Squad' ? 'selected' : '' %>>Squad</option>
-                  </select>
-                  <div class="invalid-feedback">Please select a mode.</div>
+                  <label class="form-label fw-semibold">Game / Sport Name</label>
+                  <input type="text" name="tournament[game]" class="form-control"
+                    value="<%= tournament.game %>" required/>
+                  <div class="invalid-feedback">Please enter the game or sport name.</div>
                 </div>
               </div>
 
+              <!-- Format / Mode — data-current-mode lets JS pre-select the right option -->
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Participation Format</label>
+                <select name="tournament[mode]" class="form-select" id="mode"
+                  data-current-mode="<%= tournament.mode %>" required>
+                  <option value="">-- Select Format --</option>
+                </select>
+                <div class="invalid-feedback">Please select a format.</div>
+              </div>
+
+              <!-- Description -->
               <div class="mb-3">
                 <label class="form-label fw-semibold">Description</label>
-                <textarea name="tournament[description]" class="form-control" id="description"
+                <textarea name="tournament[description]" class="form-control"
                   rows="3" required minlength="10"><%= tournament.description %></textarea>
                 <div class="invalid-feedback">Description must be at least 10 characters.</div>
               </div>
 
+              <!-- Rules -->
               <div class="mb-3">
                 <label class="form-label fw-semibold">Rules</label>
                 <div id="rulesContainer">
@@ -60,9 +76,7 @@
                   %>
                   <% existingRules.forEach((rule, idx) => { %>
                     <div class="rule-item d-flex gap-2 mb-2">
-                      <span class="rule-number cyber-tag-line pt-2">
-                        <%= String(idx + 1).padStart(2, '0') %>.
-                      </span>
+                      <span class="rule-number cyber-tag-line pt-2"><%= String(idx + 1).padStart(2, '0') %>.</span>
                       <input type="text" class="form-control rule-input"
                         placeholder="Add a rule..." value="<%= rule %>"/>
                       <button type="button" class="btn btn-outline-danger btn-sm remove-rule"
@@ -79,6 +93,7 @@
                 <div class="text-danger small mt-1" id="rulesError" style="display:none;"></div>
               </div>
 
+              <!-- Prize + Entry Fee -->
               <div class="row g-3 mb-3">
                 <div class="col-md-6">
                   <label class="form-label fw-semibold">Prize Pool</label>
@@ -93,54 +108,37 @@
                 </div>
               </div>
 
+              <!-- Max Players + Dates -->
               <div class="row g-3 mb-3">
                 <div class="col-md-4">
-                  <label class="form-label fw-semibold">Max Players</label>
+                  <label class="form-label fw-semibold">Max Participants</label>
                   <input type="number" name="tournament[maxPlayers]" class="form-control"
                     id="maxPlayers" value="<%= tournament.maxPlayers %>" min="2" max="500"/>
-                  <div class="invalid-feedback">Min 2, max 500 players.</div>
+                  <div class="invalid-feedback">Min 2, max 500 participants.</div>
                 </div>
                 <div class="col-md-4">
-                  <label class="form-label fw-semibold">Start Date</label>
+                  <label class="form-label fw-semibold">Start Date & Time</label>
                   <input type="datetime-local" name="tournament[startDate]"
-                    class="form-control" id="startDate"
+                    class="form-control"
                     value="<%= new Date(tournament.startDate).toISOString().slice(0,16) %>"/>
                   <div class="invalid-feedback">Please set a valid start date.</div>
                 </div>
                 <div class="col-md-4">
-                  <label class="form-label fw-semibold">Registration Deadline</label>
+                  <label class="form-label fw-semibold">Registration Closes</label>
                   <input type="datetime-local" name="tournament[registrationDeadline]"
-                    class="form-control" id="regDeadline"
+                    class="form-control"
                     value="<%= new Date(tournament.registrationDeadline).toISOString().slice(0,16) %>"/>
                   <div class="invalid-feedback">Deadline must be before start date.</div>
                 </div>
               </div>
 
-              <div class="row g-3 mb-3">
-                <div class="col-md-6">
-                  <label class="form-label fw-semibold">
-                    Room ID
-                    <span class="text-muted fw-normal"
-                      style="font-family:'DM Sans'; font-size:0.75rem; text-transform:none; letter-spacing:0;">
-                      (visible only to accepted players)
-                    </span>
-                  </label>
-                  <input type="text" name="tournament[roomId]" class="form-control"
-                    value="<%= tournament.roomId %>"/>
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label fw-semibold">Room Password</label>
-                  <input type="text" name="tournament[roomPassword]" class="form-control"
-                    value="<%= tournament.roomPassword %>"/>
-                </div>
-              </div>
-
+              <!-- Status -->
               <div class="mb-4">
                 <label class="form-label fw-semibold">Status</label>
                 <select name="tournament[status]" class="form-select">
-                  <option value="upcoming"  <%= tournament.status === 'upcoming'  ? 'selected' : '' %>>Upcoming</option>
-                  <option value="ongoing"   <%= tournament.status === 'ongoing'   ? 'selected' : '' %>>Ongoing</option>
-                  <option value="completed" <%= tournament.status === 'completed' ? 'selected' : '' %>>Completed</option>
+                  <option value="upcoming"  <%= tournament.status === 'upcoming'  ? 'selected' : '' %>>Upcoming — Open for registration</option>
+                  <option value="ongoing"   <%= tournament.status === 'ongoing'   ? 'selected' : '' %>>Ongoing — Currently in progress</option>
+                  <option value="completed" <%= tournament.status === 'completed' ? 'selected' : '' %>>Completed — Tournament finished</option>
                 </select>
               </div>
 
