@@ -9,7 +9,7 @@
   <div class="container my-5">
     <%- include('../partials/flash') %>
 
-    <!-- Winner Banner — shown to everyone when tournament is completed -->
+    <!-- Winner Banner -->
     <% if (tournament.status === 'completed' && tournament.winner) { %>
       <div class="mb-4" style="border:1px solid rgba(250,204,21,0.4); background:rgba(250,204,21,0.04); padding:24px; position:relative;">
         <div style="position:absolute; top:0; left:0; width:50px; height:2px; background:#facc15;"></div>
@@ -26,12 +26,10 @@
               <%= tournament.winner.username %>
             </a>
             <div style="font-family:'Share Tech Mono',monospace; font-size:0.62rem; color:#78716c; letter-spacing:0.15em; margin-top:3px;">
-              DECLARED WINNER · <%= new Date(tournament.winnerDeclaredAt).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) %>
+              BRACKET WINNER · <%= new Date(tournament.winnerDeclaredAt).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) %>
             </div>
           </div>
         </div>
-
-        <!-- Support / Report counts — visible to everyone -->
         <div class="d-flex gap-3 mt-3">
           <span style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:#22c55e; letter-spacing:0.1em;">
             ✓ <%= tournament.resultSupports.length %> SUPPORT<%= tournament.resultSupports.length !== 1 ? 'S' : '' %>
@@ -40,8 +38,6 @@
             ⚑ <%= tournament.resultReports.length %> REPORT<%= tournament.resultReports.length !== 1 ? 'S' : '' %>
           </span>
         </div>
-
-        <!-- Support / Report actions — accepted players only -->
         <% if (isAccepted) { %>
           <div class="d-flex gap-2 mt-3">
             <% if (hasResponded) { %>
@@ -50,9 +46,7 @@
               </span>
             <% } else { %>
               <form action="/tournaments/<%= tournament._id %>/support" method="POST">
-                <button class="btn btn-sm btn-outline-success">
-                  <i class="bi bi-hand-thumbs-up"></i> Support Result
-                </button>
+                <button class="btn btn-sm btn-outline-success"><i class="bi bi-hand-thumbs-up"></i> Support Result</button>
               </form>
               <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#reportResultModal">
                 <i class="bi bi-flag"></i> Report Result
@@ -60,27 +54,23 @@
             <% } %>
           </div>
         <% } %>
-
+        <div class="mt-3">
+          <a href="/tournaments/<%= tournament._id %>/bracket" style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:var(--cyber-blue); letter-spacing:0.15em; text-decoration:none;">
+            <i class="bi bi-diagram-3"></i> VIEW FULL BRACKET →
+          </a>
+        </div>
       </div>
     <% } %>
 
-    <!-- Blocked warning — visible to organiser and admin only -->
+    <!-- Blocked Warning -->
     <% if (tournament.blocked) { %>
       <div class="alert mb-4" style="background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.4); border-left-width:4px; border-radius:0;">
-        <div style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:#ef4444; letter-spacing:0.2em; margin-bottom:6px;">
-          ⚠ TOURNAMENT BLOCKED BY ADMIN
-        </div>
-        <p style="font-size:0.83rem; color:#fca5a5; margin-bottom:4px;">
-          This tournament has been hidden from public view and players cannot apply.
-        </p>
+        <div style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:#ef4444; letter-spacing:0.2em; margin-bottom:6px;">⚠ TOURNAMENT BLOCKED BY ADMIN</div>
+        <p style="font-size:0.83rem; color:#fca5a5; margin-bottom:4px;">This tournament has been hidden from public view and players cannot apply.</p>
         <% if (tournament.blockedReason) { %>
-          <p style="font-family:'Share Tech Mono',monospace; font-size:0.72rem; color:#ef4444; margin:0;">
-            REASON: <%= tournament.blockedReason %>
-          </p>
+          <p style="font-family:'Share Tech Mono',monospace; font-size:0.72rem; color:#ef4444; margin:0;">REASON: <%= tournament.blockedReason %></p>
         <% } %>
-        <p style="font-size:0.75rem; color:#475569; margin-top:8px; margin-bottom:0;">
-          If you believe this is a mistake, contact the platform admin.
-        </p>
+        <p style="font-size:0.75rem; color:#475569; margin-top:8px; margin-bottom:0;">If you believe this is a mistake, contact the platform admin.</p>
       </div>
     <% } %>
 
@@ -93,9 +83,7 @@
 
             <div class="d-flex justify-content-between align-items-start mb-2">
               <h2 class="fw-bold mb-0"><%= tournament.title %></h2>
-              <span class="badge fs-6
-                <%= tournament.status === 'upcoming'  ? 'bg-success'  :
-                    tournament.status === 'ongoing'   ? 'bg-warning'  : 'bg-secondary' %>">
+              <span class="badge fs-6 <%= tournament.status === 'upcoming' ? 'bg-success' : tournament.status === 'ongoing' ? 'bg-warning' : 'bg-secondary' %>">
                 <%= tournament.status.toUpperCase() %>
               </span>
             </div>
@@ -106,14 +94,10 @@
               <i class="bi bi-people"></i> <%= tournament.mode %>
               &nbsp;/&nbsp;
               <i class="bi bi-person-badge"></i>
-              <a href="/profile/<%= tournament.organiser._id %>" style="color:var(--cyber-blue);">
-                <%= tournament.organiser.username %>
-              </a>
+              <a href="/profile/<%= tournament.organiser._id %>" style="color:var(--cyber-blue);"><%= tournament.organiser.username %></a>
             </p>
 
-            <p style="color:#94a3b8; font-size:0.9rem; line-height:1.7;">
-              <%= tournament.description %>
-            </p>
+            <p style="color:#94a3b8; font-size:0.9rem; line-height:1.7;"><%= tournament.description %></p>
 
             <hr/>
 
@@ -139,9 +123,7 @@
               </div>
               <div class="col-6 col-md-3">
                 <div class="ba-stat-box">
-                  <div class="fs-5 fw-bold">
-                    <%= tournament.applicants.filter(a => a.status === 'accepted').length %>
-                  </div>
+                  <div class="fs-5 fw-bold"><%= tournament.applicants.filter(a => a.status === 'accepted').length %></div>
                   <div class="small">Accepted</div>
                 </div>
               </div>
@@ -152,29 +134,21 @@
               <div class="col-md-6">
                 <span style="color:var(--cyber-blue); font-family:'Share Tech Mono',monospace; font-size:0.65rem; letter-spacing:0.15em;">START DATE</span><br/>
                 <span style="color:#94a3b8;">
-                  <%= new Date(tournament.startDate).toLocaleString('en-IN', {
-                    day:'numeric', month:'short', year:'numeric',
-                    hour:'2-digit', minute:'2-digit'
-                  }) %>
+                  <%= new Date(tournament.startDate).toLocaleString('en-IN', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) %>
                 </span>
               </div>
               <div class="col-md-6">
                 <span style="color:var(--cyber-blue); font-family:'Share Tech Mono',monospace; font-size:0.65rem; letter-spacing:0.15em;">REGISTRATION DEADLINE</span><br/>
                 <span style="color:#94a3b8;">
-                  <%= new Date(tournament.registrationDeadline).toLocaleString('en-IN', {
-                    day:'numeric', month:'short', year:'numeric',
-                    hour:'2-digit', minute:'2-digit'
-                  }) %>
+                  <%= new Date(tournament.registrationDeadline).toLocaleString('en-IN', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) %>
                 </span>
               </div>
             </div>
 
-            <!-- Rules point-wise -->
+            <!-- Rules -->
             <% if (tournament.rules) { %>
               <hr/>
-              <p style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:var(--cyber-blue); letter-spacing:0.2em; margin-bottom:10px;">
-                RULES
-              </p>
+              <p style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:var(--cyber-blue); letter-spacing:0.2em; margin-bottom:10px;">RULES</p>
               <ul class="list-unstyled mb-0">
                 <% tournament.rules.split('\n').filter(r => r.trim()).forEach(rule => { %>
                   <li class="d-flex gap-2 mb-2" style="font-size:0.85rem;">
@@ -189,21 +163,15 @@
             <% if (isAccepted) { %>
               <hr/>
               <div class="alert alert-success mt-2">
-                <p style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; letter-spacing:0.2em; margin-bottom:10px;">
-                  ROOM DETAILS
-                </p>
+                <p style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; letter-spacing:0.2em; margin-bottom:10px;">ROOM DETAILS</p>
                 <div class="row g-2">
                   <div class="col-md-6">
                     <span style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:#86efac; letter-spacing:0.1em;">ROOM ID</span><br/>
-                    <strong style="font-size:1rem; letter-spacing:0.1em;">
-                      <%= tournament.roomId || 'Not set yet' %>
-                    </strong>
+                    <strong style="font-size:1rem; letter-spacing:0.1em;"><%= tournament.roomId || 'Not set yet' %></strong>
                   </div>
                   <div class="col-md-6">
                     <span style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:#86efac; letter-spacing:0.1em;">PASSWORD</span><br/>
-                    <strong style="font-size:1rem; letter-spacing:0.1em;">
-                      <%= tournament.roomPassword || 'Not set yet' %>
-                    </strong>
+                    <strong style="font-size:1rem; letter-spacing:0.1em;"><%= tournament.roomPassword || 'Not set yet' %></strong>
                   </div>
                 </div>
               </div>
@@ -212,108 +180,101 @@
           </div>
         </div>
 
+        <!-- View Bracket button — visible to everyone once generated -->
+        <% if (tournament.bracketGenerated) { %>
+          <div class="mb-4">
+            <a href="/tournaments/<%= tournament._id %>/bracket" class="btn btn-warning fw-bold px-4 py-2">
+              <i class="bi bi-diagram-3-fill"></i> View Bracket
+            </a>
+          </div>
+        <% } %>
+
         <!-- Organiser Actions -->
         <% if (currUser && tournament.organiser._id.equals(currUser._id)) { %>
-          <div class="d-flex gap-2 mb-4">
+          <div class="d-flex gap-2 mb-4 flex-wrap">
             <a href="/tournaments/<%= tournament._id %>/edit" class="btn btn-outline-warning">
               <i class="bi bi-pencil"></i> Edit Tournament
             </a>
             <form action="/tournaments/<%= tournament._id %>?_method=DELETE" method="POST"
               onsubmit="return confirm('Delete this tournament? This cannot be undone.')">
-              <button class="btn btn-outline-danger">
-                <i class="bi bi-trash"></i> Delete
-              </button>
+              <button class="btn btn-outline-danger"><i class="bi bi-trash"></i> Delete</button>
             </form>
           </div>
 
           <!-- Room Details Update -->
           <div class="card ba-card mb-4">
             <div class="card-body p-4">
-              <p style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:var(--cyber-blue); letter-spacing:0.2em; margin-bottom:16px;">
-                // ROOM DETAILS
-              </p>
+              <p style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:var(--cyber-blue); letter-spacing:0.2em; margin-bottom:16px;">// ROOM DETAILS</p>
               <% if (tournament.roomId || tournament.roomPassword) { %>
                 <div class="row g-2 mb-4">
                   <div class="col-md-6">
                     <span style="font-family:'Share Tech Mono',monospace; font-size:0.62rem; color:#475569; letter-spacing:0.15em;">CURRENT ROOM ID</span>
-                    <div style="font-size:1rem; font-weight:700; color:var(--cyber-blue); letter-spacing:0.1em; margin-top:4px;">
-                      <%= tournament.roomId || '—' %>
-                    </div>
+                    <div style="font-size:1rem; font-weight:700; color:var(--cyber-blue); letter-spacing:0.1em; margin-top:4px;"><%= tournament.roomId || '—' %></div>
                   </div>
                   <div class="col-md-6">
                     <span style="font-family:'Share Tech Mono',monospace; font-size:0.62rem; color:#475569; letter-spacing:0.15em;">CURRENT PASSWORD</span>
-                    <div style="font-size:1rem; font-weight:700; color:var(--cyber-blue); letter-spacing:0.1em; margin-top:4px;">
-                      <%= tournament.roomPassword || '—' %>
-                    </div>
+                    <div style="font-size:1rem; font-weight:700; color:var(--cyber-blue); letter-spacing:0.1em; margin-top:4px;"><%= tournament.roomPassword || '—' %></div>
                   </div>
                 </div>
               <% } else { %>
-                <p style="font-size:0.8rem; color:#475569; margin-bottom:16px;">
-                  No room details set yet. Add them below so accepted players can join.
-                </p>
+                <p style="font-size:0.8rem; color:#475569; margin-bottom:16px;">No room details set yet. Add them below so accepted players can join.</p>
               <% } %>
               <form action="/tournaments/<%= tournament._id %>/room?_method=PATCH" method="POST">
                 <div class="row g-2">
                   <div class="col-md-5">
-                    <input type="text" name="roomId" class="form-control" placeholder="Room ID"
-                      value="<%= tournament.roomId || '' %>" required/>
+                    <input type="text" name="roomId" class="form-control" placeholder="Room ID" value="<%= tournament.roomId || '' %>" required/>
                   </div>
                   <div class="col-md-5">
-                    <input type="text" name="roomPassword" class="form-control" placeholder="Room Password"
-                      value="<%= tournament.roomPassword || '' %>" required/>
+                    <input type="text" name="roomPassword" class="form-control" placeholder="Room Password" value="<%= tournament.roomPassword || '' %>" required/>
                   </div>
                   <div class="col-md-2">
-                    <button type="submit" class="btn btn-warning w-100">
-                      <i class="bi bi-save"></i> Save
-                    </button>
+                    <button type="submit" class="btn btn-warning w-100"><i class="bi bi-save"></i> Save</button>
                   </div>
                 </div>
               </form>
             </div>
           </div>
 
-          <!-- Declare Winner -->
+          <!-- Bracket Section — replaces manual declare winner -->
           <% if (tournament.status === 'ongoing') { %>
             <% const acceptedPlayers = tournament.applicants.filter(a => a.status === 'accepted'); %>
-            <% if (acceptedPlayers.length > 0) { %>
-              <div class="card ba-card mb-4" style="border-color:rgba(250,204,21,0.25);">
-                <div class="card-body p-4">
-                  <p style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:#facc15; letter-spacing:0.2em; margin-bottom:6px;">
-                    // DECLARE WINNER
-                  </p>
-                  <p style="font-size:0.78rem; color:#475569; margin-bottom:16px;">
-                    Select the winner from accepted participants. This action is permanent and cannot be undone. Tournament will be marked as completed.
-                  </p>
-                  <form action="/tournaments/<%= tournament._id %>/declare-winner?_method=PATCH" method="POST"
-                    onsubmit="return confirm('Declare this player as winner? This cannot be undone.')">
-                    <div class="row g-2">
-                      <div class="col-md-8">
-                        <select name="winnerId" class="form-select" required>
-                          <option value="">Select winner...</option>
-                          <% acceptedPlayers.forEach(app => { %>
-                            <option value="<%= app.player._id %>">
-                              <%= app.player.username %>
-                              <%= app.player.gameUsername ? '(' + app.player.gameUsername + ')' : '' %>
-                            </option>
-                          <% }) %>
-                        </select>
-                      </div>
-                      <div class="col-md-4">
-                        <button type="submit" class="btn btn-warning w-100 fw-bold">
-                          <i class="bi bi-trophy-fill"></i> Declare Winner
-                        </button>
-                      </div>
-                    </div>
-                  </form>
-                </div>
+            <div class="card ba-card mb-4" style="border-color:rgba(56,189,248,0.2);">
+              <div class="card-body p-4">
+                <% if (!tournament.bracketGenerated) { %>
+                  <p style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:var(--cyber-blue); letter-spacing:0.2em; margin-bottom:6px;">// BRACKET</p>
+                  <% if (acceptedPlayers.length >= 2) { %>
+                    <%
+                      const n = acceptedPlayers.length;
+                      const mainSize = Math.pow(2, Math.floor(Math.log2(n)));
+                      const prelimCount = n - mainSize;
+                    %>
+                    <p style="font-size:0.8rem; color:#475569; margin-bottom:6px;">
+                      <strong style="color:#94a3b8;"><%= acceptedPlayers.length %></strong> players accepted.
+                      <% if (prelimCount > 0) { %>
+                        <strong style="color:#f97316;"><%= prelimCount * 2 %></strong> will play in prelims,
+                        <strong style="color:#94a3b8;"><%= mainSize - prelimCount %></strong> get byes into Round 1.
+                      <% } else { %>
+                        Perfect power of 2 — no prelim round needed.
+                      <% } %>
+                    </p>
+                    <p style="font-size:0.75rem; color:#475569; margin-bottom:16px;">Prelim spots go to the last registered players. This action is permanent.</p>
+                    <form action="/tournaments/<%= tournament._id %>/bracket/generate" method="POST"
+                      onsubmit="return confirm('Generate bracket? This cannot be undone.')">
+                      <button type="submit" class="btn btn-warning fw-bold px-4">
+                        <i class="bi bi-diagram-3-fill"></i> Generate Bracket
+                      </button>
+                    </form>
+                  <% } else { %>
+                    <p style="font-size:0.8rem; color:#475569; margin-bottom:0;">Accept at least <strong>2 players</strong> before generating the bracket.</p>
+                  <% } %>
+                <% } else { %>
+                  <p style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:#22c55e; letter-spacing:0.2em; margin-bottom:10px;">✓ BRACKET ACTIVE</p>
+                  <a href="/tournaments/<%= tournament._id %>/bracket" class="btn btn-warning fw-bold px-4">
+                    <i class="bi bi-diagram-3-fill"></i> Manage Bracket
+                  </a>
+                <% } %>
               </div>
-            <% } else { %>
-              <div class="alert mb-4" style="background:rgba(250,204,21,0.04); border:1px solid rgba(250,204,21,0.2); border-radius:0;">
-                <p style="font-family:'Share Tech Mono',monospace; font-size:0.65rem; color:#facc15; letter-spacing:0.15em; margin:0;">
-                  // Accept at least one participant before declaring a winner.
-                </p>
-              </div>
-            <% } %>
+            </div>
           <% } %>
         <% } %>
 
@@ -326,43 +287,35 @@
           %>
           <% if (!myApp) { %>
             <% if (tournament.status === 'completed') { %>
-              <div class="alert alert-info">
-                <i class="bi bi-flag-fill"></i> This tournament has ended.
-              </div>
+              <div class="alert alert-info"><i class="bi bi-flag-fill"></i> This tournament has ended.</div>
             <% } else if (tournament.blocked) { %>
-              <div class="alert alert-danger">
-                <i class="bi bi-slash-circle"></i> Applications are currently closed for this tournament.
-              </div>
+              <div class="alert alert-danger"><i class="bi bi-slash-circle"></i> Applications are currently closed for this tournament.</div>
+            <% } else if (tournament.bracketGenerated) { %>
+              <div class="alert alert-info"><i class="bi bi-diagram-3"></i> Bracket has already been generated. Registration is closed.</div>
             <% } else { %>
               <form action="/tournaments/<%= tournament._id %>/apply" method="POST">
-                <button class="btn btn-warning fw-bold px-4 py-2">
-                  <i class="bi bi-send"></i> Apply to Join
-                </button>
+                <button class="btn btn-warning fw-bold px-4 py-2"><i class="bi bi-send"></i> Apply to Join</button>
               </form>
             <% } %>
           <% } else if (myApp.status === 'pending') { %>
             <div class="alert alert-info d-flex justify-content-between align-items-center">
-              <span>
-                <i class="bi bi-hourglass-split"></i>
-                Your application is <strong>pending</strong> — waiting for organiser review.
-              </span>
+              <span><i class="bi bi-hourglass-split"></i> Your application is <strong>pending</strong> — waiting for organiser review.</span>
               <form action="/tournaments/<%= tournament._id %>/withdraw?_method=DELETE" method="POST"
                 onsubmit="return confirm('Withdraw your application?')">
-                <button class="btn btn-outline-danger btn-sm ms-3">
-                  <i class="bi bi-x-circle"></i> Withdraw
-                </button>
+                <button class="btn btn-outline-danger btn-sm ms-3"><i class="bi bi-x-circle"></i> Withdraw</button>
               </form>
             </div>
           <% } else if (myApp.status === 'accepted') { %>
-            <div class="alert alert-success">
-              <i class="bi bi-check-circle-fill"></i>
-              You've been <strong>accepted</strong>! Room details are shown above.
+            <div class="alert alert-success d-flex justify-content-between align-items-center flex-wrap gap-2">
+              <span><i class="bi bi-check-circle-fill"></i> You've been <strong>accepted</strong>! Room details are shown above.</span>
+              <% if (tournament.bracketGenerated) { %>
+                <a href="/tournaments/<%= tournament._id %>/bracket" class="btn btn-warning btn-sm fw-bold">
+                  <i class="bi bi-diagram-3-fill"></i> View Your Matches
+                </a>
+              <% } %>
             </div>
           <% } else { %>
-            <div class="alert alert-danger">
-              <i class="bi bi-x-circle-fill"></i>
-              Your application was <strong>rejected</strong>.
-            </div>
+            <div class="alert alert-danger"><i class="bi bi-x-circle-fill"></i> Your application was <strong>rejected</strong>.</div>
           <% } %>
         <% } %>
 
@@ -384,68 +337,54 @@
               <% if (tournament.applicants.length === 0) { %>
                 <p class="text-muted small">No applications yet.</p>
               <% } else { %>
-                <% const pending  = tournament.applicants.filter(a => a.status === 'pending');  %>
+                <% const pending  = tournament.applicants.filter(a => a.status === 'pending'); %>
                 <% const accepted = tournament.applicants.filter(a => a.status === 'accepted'); %>
                 <% const rejected = tournament.applicants.filter(a => a.status === 'rejected'); %>
+
                 <% if (pending.length > 0) { %>
-                  <p style="font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:#475569; letter-spacing:0.15em; margin-bottom:8px;">
-                    PENDING (<%= pending.length %>)
-                  </p>
+                  <p style="font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:#475569; letter-spacing:0.15em; margin-bottom:8px;">PENDING (<%= pending.length %>)</p>
                   <% pending.forEach(app => { %>
                     <div class="applicant-row">
                       <div class="d-flex justify-content-between align-items-center">
                         <div>
-                          <a href="/profile/<%= app.player._id %>"
-                            style="font-size:0.85rem; font-weight:600; color:var(--cyber-text); text-decoration:none;">
-                            <%= app.player.username %>
-                          </a>
-                          <div style="font-size:0.7rem; color:#475569;">
-                            <%= app.player.gameUsername || 'No IGN set' %>
+                          <a href="/profile/<%= app.player._id %>" style="font-size:0.85rem; font-weight:600; color:var(--cyber-text); text-decoration:none;"><%= app.player.username %></a>
+                          <div style="font-size:0.7rem; color:#475569;"><%= app.player.gameUsername || 'No IGN set' %></div>
+                        </div>
+                        <% if (!tournament.bracketGenerated) { %>
+                          <div class="d-flex flex-column gap-1">
+                            <form action="/tournaments/<%= tournament._id %>/applicants/<%= app.player._id %>/accept?_method=PATCH" method="POST">
+                              <button class="btn btn-success btn-sm w-100">✓ Accept</button>
+                            </form>
+                            <form action="/tournaments/<%= tournament._id %>/applicants/<%= app.player._id %>/reject?_method=PATCH" method="POST">
+                              <button class="btn btn-danger btn-sm w-100">✗ Reject</button>
+                            </form>
                           </div>
-                        </div>
-                        <div class="d-flex flex-column gap-1">
-                          <form action="/tournaments/<%= tournament._id %>/applicants/<%= app.player._id %>/accept?_method=PATCH" method="POST">
-                            <button class="btn btn-success btn-sm w-100">✓ Accept</button>
-                          </form>
-                          <form action="/tournaments/<%= tournament._id %>/applicants/<%= app.player._id %>/reject?_method=PATCH" method="POST">
-                            <button class="btn btn-danger btn-sm w-100">✗ Reject</button>
-                          </form>
-                        </div>
+                        <% } else { %>
+                          <span style="font-family:'Share Tech Mono',monospace; font-size:0.58rem; color:#334155; letter-spacing:0.1em;">LOCKED</span>
+                        <% } %>
                       </div>
                     </div>
                   <% }) %>
                 <% } %>
+
                 <% if (accepted.length > 0) { %>
-                  <p style="font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:#475569; letter-spacing:0.15em; margin: 12px 0 8px;">
-                    ACCEPTED (<%= accepted.length %>)
-                  </p>
+                  <p style="font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:#475569; letter-spacing:0.15em; margin: 12px 0 8px;">ACCEPTED (<%= accepted.length %>)</p>
                   <% accepted.forEach(app => { %>
                     <div class="d-flex justify-content-between align-items-center mb-2">
                       <div>
-                        <a href="/profile/<%= app.player._id %>"
-                          style="font-size:0.82rem; font-weight:600; color:#86efac; text-decoration:none;">
-                          <%= app.player.username %>
-                        </a>
-                        <div style="font-size:0.68rem; color:#475569;">
-                          <%= app.player.gameUsername || 'No IGN' %>
-                        </div>
+                        <a href="/profile/<%= app.player._id %>" style="font-size:0.82rem; font-weight:600; color:#86efac; text-decoration:none;"><%= app.player.username %></a>
+                        <div style="font-size:0.68rem; color:#475569;"><%= app.player.gameUsername || 'No IGN' %></div>
                       </div>
                       <span class="badge bg-success">ACCEPTED</span>
                     </div>
                   <% }) %>
                 <% } %>
+
                 <% if (rejected.length > 0) { %>
-                  <p style="font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:#475569; letter-spacing:0.15em; margin: 12px 0 8px;">
-                    REJECTED (<%= rejected.length %>)
-                  </p>
+                  <p style="font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:#475569; letter-spacing:0.15em; margin: 12px 0 8px;">REJECTED (<%= rejected.length %>)</p>
                   <% rejected.forEach(app => { %>
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                      <div>
-                        <a href="/profile/<%= app.player._id %>"
-                          style="font-size:0.82rem; color:#475569; text-decoration:none;">
-                          <%= app.player.username %>
-                        </a>
-                      </div>
+                      <a href="/profile/<%= app.player._id %>" style="font-size:0.82rem; color:#475569; text-decoration:none;"><%= app.player.username %></a>
                       <span class="badge bg-danger">REJECTED</span>
                     </div>
                   <% }) %>
@@ -464,19 +403,14 @@
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content" style="background:#0a0f1e; border:1px solid rgba(239,68,68,0.3); border-radius:0;">
         <div class="modal-header" style="border-bottom:1px solid rgba(239,68,68,0.15);">
-          <h6 class="modal-title fw-bold" style="font-family:'Orbitron',monospace; font-size:0.85rem; color:#ef4444;">
-            REPORT RESULT
-          </h6>
+          <h6 class="modal-title fw-bold" style="font-family:'Orbitron',monospace; font-size:0.85rem; color:#ef4444;">REPORT RESULT</h6>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
         <form action="/tournaments/<%= tournament._id %>/report" method="POST">
           <div class="modal-body">
-            <p style="font-size:0.82rem; color:#94a3b8; margin-bottom:14px;">
-              Tell us why you believe this result is wrong.
-            </p>
+            <p style="font-size:0.82rem; color:#94a3b8; margin-bottom:14px;">Tell us why you believe this result is wrong.</p>
             <label class="form-label fw-semibold" style="font-size:0.78rem;">Reason</label>
-            <textarea name="reason" class="form-control" rows="3"
-              placeholder="e.g. Wrong winner declared, match never happened..."></textarea>
+            <textarea name="reason" class="form-control" rows="3" placeholder="e.g. Wrong winner declared, match never happened..."></textarea>
           </div>
           <div class="modal-footer" style="border-top:1px solid rgba(239,68,68,0.15);">
             <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>

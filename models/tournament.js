@@ -43,11 +43,16 @@ const tournamentSchema = new mongoose.Schema({
     required: true
   },
   applicants: [applicantSchema],
-  // Hidden from players unless accepted
-  roomId: { type: String, default: "" },
-  roomPassword: { type: String, default: "" } ,
+  roomId:       { type: String, default: "" },
+  roomPassword: { type: String, default: "" },
   blocked:      { type: Boolean, default: false },
   blockedReason:{ type: String, default: "" },
+
+  // ── Bracket fields ──
+  bracketGenerated: { type: Boolean, default: false },
+  totalRounds:      { type: Number, default: 0 },
+
+  // Winner set by bracket system
   winner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
@@ -57,6 +62,7 @@ const tournamentSchema = new mongoose.Schema({
     type: Date,
     default: null
   },
+
   resultSupports: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "User"
@@ -66,7 +72,5 @@ const tournamentSchema = new mongoose.Schema({
     reason: { type: String, default: "" }
   }]
 }, { timestamps: true });
-
-
 
 module.exports = mongoose.model("Tournament", tournamentSchema);

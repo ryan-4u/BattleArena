@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head') %>
+  <title><%= tournament.title %> — Bracket | BattleArena</title>
+  <style>
+    .bracket-page { padding: 32px 0 80px; min-height: 100vh; }
+    .back-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: 'Share Tech Mono', monospace; font-size: 0.68rem;
+      letter-spacing: 0.2em; color: var(--cyber-blue); text-decoration: none;
+      margin-bottom: 20px; transition: color 0.2s;
+    }
+    .back-link:hover { color: #facc15; }
+    .bracket-title-row { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .bracket-scroll { overflow-x: auto; padding-bottom: 24px; cursor: grab; user-select: none; }
+    .bracket-scroll:active { cursor: grabbing; }
+    .bracket-tree { display: flex; align-items: stretch; gap: 0; min-width: max-content; padding: 24px 8px; }
+    .bracket-round { display: flex; flex-direction: column; align-items: center; min-width: 200px; }
+    .round-label {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.25em; color: #475569; margin-bottom: 16px;
+      text-align: center; padding: 0 8px;
+    }
+    .round-label.prelim { color: #f97316; }
+    .round-label.final  { color: #facc15; }
+    .round-label.sf     { color: #a78bfa; }
+    .round-label.qf     { color: #38bdf8; }
+    .matches-column {
+      display: flex; flex-direction: column; justify-content: space-around;
+      flex: 1; width: 100%; gap: 8px; padding: 0 8px;
+    }
+    .match-card {
+      background: #0a0f1e; border: 1px solid rgba(56,189,248,0.12);
+      position: relative; width: 184px; transition: border-color 0.2s;
+    }
+    .match-card.status-conflict  { border-color: rgba(239,68,68,0.5); box-shadow: 0 0 12px rgba(239,68,68,0.1); }
+    .match-card.status-confirmed { border-color: rgba(34,197,94,0.3); }
+    .match-card.status-bye       { border-color: rgba(71,85,105,0.3); opacity: 0.6; }
+    .match-card.status-pending   { border-color: rgba(56,189,248,0.25); }
+    .match-card.status-awaiting  { border-color: rgba(71,85,105,0.2); opacity: 0.5; }
+    .match-number {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.52rem;
+      color: #334155; letter-spacing: 0.15em; padding: 5px 8px 3px;
+      border-bottom: 1px solid rgba(56,189,248,0.06);
+    }
+    .match-player {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 7px 10px; font-size: 0.78rem; font-weight: 600; color: #94a3b8; gap: 6px;
+    }
+    .match-player + .match-player { border-top: 1px solid rgba(255,255,255,0.04); }
+    .match-player.is-winner { color: #facc15; background: rgba(250,204,21,0.04); }
+    .match-player.is-loser  { color: #334155; text-decoration: line-through; }
+    .player-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 110px; flex: 1; }
+    .player-name.tbd { color: #1e3a5f; font-style: italic; font-weight: 400; }
+    .result-badge {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.52rem;
+      letter-spacing: 0.1em; padding: 2px 5px; border-radius: 2px; flex-shrink: 0;
+    }
+    .result-badge.win      { background: rgba(34,197,94,0.15); color: #22c55e; }
+    .result-badge.loss     { background: rgba(239,68,68,0.1);  color: #ef4444; }
+    .result-badge.pending-r{ background: rgba(250,204,21,0.08); color: #facc15; }
+    .match-divider { height: 1px; background: rgba(56,189,248,0.07); margin: 0 10px; }
+    .conflict-bar {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.52rem; color: #ef4444;
+      letter-spacing: 0.15em; padding: 4px 10px;
+      border-top: 1px solid rgba(239,68,68,0.15); background: rgba(239,68,68,0.04);
+    }
+    .round-connector { display: flex; flex-direction: column; justify-content: space-around; width: 24px; flex-shrink: 0; align-self: stretch; }
+    .connector-group { display: flex; flex-direction: column; flex: 1; justify-content: center; align-items: center; position: relative; }
+    .connector-group::before,
+    .connector-group::after { content: ''; position: absolute; right: 0; width: 12px; height: 1px; background: rgba(56,189,248,0.2); }
+    .connector-group::before { top: 25%; }
+    .connector-group::after  { top: 75%; }
+    .match-actions { padding: 6px 10px 8px; display: flex; gap: 5px; border-top: 1px solid rgba(56,189,248,0.07); }
+    .btn-report {
+      flex: 1; font-family: 'Share Tech Mono', monospace; font-size: 0.58rem;
+      letter-spacing: 0.1em; padding: 4px 0;
+      border: 1px solid rgba(56,189,248,0.3); background: transparent;
+      color: var(--cyber-blue); cursor: pointer; transition: all 0.15s;
+    }
+    .btn-report:hover { background: rgba(56,189,248,0.08); border-color: var(--cyber-blue); }
+    .btn-report.win-btn  { border-color: rgba(34,197,94,0.4); color: #22c55e; }
+    .btn-report.win-btn:hover  { background: rgba(34,197,94,0.08); }
+    .btn-report.loss-btn { border-color: rgba(239,68,68,0.3); color: #ef4444; }
+    .btn-report.loss-btn:hover { background: rgba(239,68,68,0.06); }
+    .bracket-winner-banner {
+      border: 1px solid rgba(250,204,21,0.3); background: rgba(250,204,21,0.03);
+      padding: 20px 24px; margin-bottom: 28px; position: relative;
+    }
+    .bracket-winner-banner::before,
+    .bracket-winner-banner::after { content: ''; position: absolute; top: 0; width: 40px; height: 2px; background: #facc15; }
+    .bracket-winner-banner::before { left: 0; }
+    .bracket-winner-banner::after  { right: 0; }
+    .conflicts-panel { background: rgba(239,68,68,0.03); border: 1px solid rgba(239,68,68,0.2); padding: 20px; margin-bottom: 28px; }
+    .bracket-stats { display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 20px; }
+    .bracket-stat { font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; color: #475569; letter-spacing: 0.1em; }
+    .bracket-stat span { color: var(--cyber-blue); font-size: 0.85rem; font-weight: 700; display: block; margin-bottom: 2px; }
+    .bracket-scroll::-webkit-scrollbar { height: 4px; }
+    .bracket-scroll::-webkit-scrollbar-track { background: #0a0f1e; }
+    .bracket-scroll::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 2px; }
+  </style>
+</head>
+<body class="ba-bg">
+  <%- include('../partials/navbar') %>
+
+  <div class="container-fluid bracket-page" style="max-width:1600px;">
+    <%- include('../partials/flash') %>
+
+    <!-- Header -->
+    <div class="bracket-header px-3">
+      <a href="/tournaments/<%= tournament._id %>" class="back-link">
+        <i class="bi bi-arrow-left"></i> BACK TO TOURNAMENT
+      </a>
+      <div class="bracket-title-row">
+        <div>
+          <p class="cyber-tag-line mb-1">// BRACKET</p>
+          <h2 class="fw-bold mb-0"><%= tournament.title %></h2>
+        </div>
+        <span class="badge fs-6 <%= tournament.status === 'ongoing' ? 'bg-warning' : tournament.status === 'completed' ? 'bg-secondary' : 'bg-success' %>">
+          <%= tournament.status.toUpperCase() %>
+        </span>
+      </div>
+      <hr class="mt-3 mb-4"/>
+
+      <%
+        const allMatches = orderedRounds.flatMap(r => r.matches);
+        const confirmedCount = allMatches.filter(m => m.status === 'confirmed').length;
+        const conflictCount  = allMatches.filter(m => m.status === 'conflict').length;
+        const pendingCount   = allMatches.filter(m => m.status === 'pending').length;
+        const totalMatches   = allMatches.filter(m => m.status !== 'awaiting').length;
+      %>
+
+      <div class="bracket-stats">
+        <div class="bracket-stat"><span><%= totalMatches %></span>TOTAL MATCHES</div>
+        <div class="bracket-stat"><span style="color:#22c55e;"><%= confirmedCount %></span>CONFIRMED</div>
+        <div class="bracket-stat"><span style="color:#facc15;"><%= pendingCount %></span>PENDING</div>
+        <% if (conflictCount > 0) { %>
+          <div class="bracket-stat"><span style="color:#ef4444;"><%= conflictCount %></span>CONFLICTS</div>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Winner Banner -->
+    <% if (tournament.status === 'completed' && tournament.winner) { %>
+      <div class="bracket-winner-banner mx-3">
+        <p style="font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:#facc15; letter-spacing:0.3em; margin-bottom:10px;">🏆 TOURNAMENT CHAMPION</p>
+        <div class="d-flex align-items-center gap-3">
+          <div style="width:48px; height:48px; border-radius:50%; background:rgba(250,204,21,0.1); border:2px solid #facc15; display:flex; align-items:center; justify-content:center; font-family:'Orbitron',monospace; font-size:1.2rem; font-weight:900; color:#facc15;">
+            <%= tournament.winner.username ? tournament.winner.username.charAt(0).toUpperCase() : '?' %>
+          </div>
+          <div>
+            <div style="font-family:'Orbitron',monospace; font-size:1rem; font-weight:900; color:#facc15; letter-spacing:0.08em;"><%= tournament.winner.username %></div>
+            <div style="font-family:'Share Tech Mono',monospace; font-size:0.6rem; color:#78716c; letter-spacing:0.15em; margin-top:3px;">
+              BRACKET WINNER · <%= new Date(tournament.winnerDeclaredAt).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% } %>
+
+    <!-- Conflicts Panel — organiser only -->
+    <%
+      const conflictMatches = allMatches.filter(m => m.status === 'conflict');
+      const isOrganiser = currUser && tournament.organiser._id.equals(currUser._id);
+    %>
+    <% if (isOrganiser && conflictMatches.length > 0) { %>
+      <div class="conflicts-panel mx-3">
+        <p style="font-family:'Share Tech Mono',monospace; font-size:0.62rem; color:#ef4444; letter-spacing:0.2em; margin-bottom:14px;">
+          ⚑ CONFLICTS REQUIRING RESOLUTION (<%= conflictMatches.length %>)
+        </p>
+        <% conflictMatches.forEach(m => { %>
+          <div class="d-flex align-items-center gap-3 mb-3 flex-wrap">
+            <span style="font-size:0.8rem; color:#94a3b8;">
+              <strong style="color:#ef4444;"><%= m.round %> · M<%= m.matchNumber + 1 %></strong>
+              &nbsp;—&nbsp;
+              <%= m.player1 ? m.player1.username : 'TBD' %> vs <%= m.player2 ? m.player2.username : 'TBD' %>
+            </span>
+            <form action="/tournaments/<%= tournament._id %>/bracket/matches/<%= m._id %>/resolve?_method=PATCH" method="POST" class="d-flex gap-2 align-items-center">
+              <select name="winnerId" class="form-select form-select-sm" style="width:auto; background:#0a0f1e; border-color:rgba(239,68,68,0.3); color:#94a3b8; font-size:0.75rem;" required>
+                <option value="">Select winner</option>
+                <% if (m.player1) { %><option value="<%= m.player1._id %>"><%= m.player1.username %></option><% } %>
+                <% if (m.player2) { %><option value="<%= m.player2._id %>"><%= m.player2.username %></option><% } %>
+              </select>
+              <button type="submit" class="btn btn-danger btn-sm" style="font-size:0.72rem; font-family:'Share Tech Mono',monospace; letter-spacing:0.1em;">RESOLVE</button>
+            </form>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+
+    <!-- Bracket Tree -->
+    <div class="bracket-scroll px-3" id="bracketScroll">
+      <div class="bracket-tree">
+
+        <% orderedRounds.forEach((round, roundIdx) => { %>
+
+          <div class="bracket-round">
+            <div class="round-label <%= round.name === 'Prelim' ? 'prelim' : round.name === 'Final' ? 'final' : round.name === 'SF' ? 'sf' : round.name === 'QF' ? 'qf' : '' %>">
+              <%= round.name === 'Prelim' ? '— PRELIM ROUND —' :
+                  round.name === 'Final'  ? '— GRAND FINAL —'  :
+                  round.name === 'SF'     ? '— SEMI FINALS —'  :
+                  round.name === 'QF'     ? '— QUARTER FINALS —' :
+                  '— ' + round.name + ' —' %>
+            </div>
+
+            <div class="matches-column">
+              <% round.matches.forEach((match) => { %>
+                <%
+                  const p1 = match.player1;
+                  const p2 = match.player2;
+                  const iAmP1 = currUser && p1 && p1._id.equals(currUser._id);
+                  const iAmP2 = currUser && p2 && p2._id.equals(currUser._id);
+                  const isMyMatch = iAmP1 || iAmP2;
+                  const myResult = iAmP1 ? match.player1Result : iAmP2 ? match.player2Result : null;
+                  const p1IsWinner = match.winner && p1 && match.winner._id.equals(p1._id);
+                  const p2IsWinner = match.winner && p2 && match.winner._id.equals(p2._id);
+                %>
+
+                <div class="match-card status-<%= match.status %>">
+                  <div class="match-number">
+                    M<%= match.matchNumber + 1 %>
+                    <% if (match.status === 'conflict') { %>
+                      <span style="color:#ef4444; float:right;">⚑ CONFLICT</span>
+                    <% } else if (match.status === 'confirmed') { %>
+                      <span style="color:#22c55e; float:right;">✓ DONE</span>
+                    <% } else if (match.status === 'awaiting') { %>
+                      <span style="color:#334155; float:right;">WAITING</span>
+                    <% } %>
+                  </div>
+
+                  <!-- Player 1 -->
+                  <div class="match-player <%= p1IsWinner ? 'is-winner' : (match.winner && !p1IsWinner && p1) ? 'is-loser' : '' %>">
+                    <span class="player-name <%= !p1 ? 'tbd' : '' %>"><%= p1 ? p1.username : 'TBD' %></span>
+                    <% if (match.player1Result) { %>
+                      <span class="result-badge <%= match.player1Result %>"><%= match.player1Result.toUpperCase() %></span>
+                    <% } else if (iAmP1 && match.status === 'pending') { %>
+                      <span class="result-badge pending-r">?</span>
+                    <% } %>
+                  </div>
+
+                  <div class="match-divider"></div>
+
+                  <!-- Player 2 -->
+                  <div class="match-player <%= p2IsWinner ? 'is-winner' : (match.winner && !p2IsWinner && p2) ? 'is-loser' : '' %>">
+                    <span class="player-name <%= !p2 ? 'tbd' : '' %>"><%= p2 ? p2.username : 'TBD' %></span>
+                    <% if (match.player2Result) { %>
+                      <span class="result-badge <%= match.player2Result %>"><%= match.player2Result.toUpperCase() %></span>
+                    <% } else if (iAmP2 && match.status === 'pending') { %>
+                      <span class="result-badge pending-r">?</span>
+                    <% } %>
+                  </div>
+
+                  <% if (match.status === 'conflict') { %>
+                    <div class="conflict-bar">⚑ AWAITING ORGANISER</div>
+                  <% } %>
+
+                  <!-- Player result actions -->
+                  <% if (isMyMatch && match.status === 'pending' && !myResult) { %>
+                    <div class="match-actions">
+                      <form action="/tournaments/<%= tournament._id %>/bracket/matches/<%= match._id %>/result" method="POST" style="flex:1; display:flex;">
+                        <input type="hidden" name="result" value="win"/>
+                        <button type="submit" class="btn-report win-btn w-100">✓ WIN</button>
+                      </form>
+                      <form action="/tournaments/<%= tournament._id %>/bracket/matches/<%= match._id %>/result" method="POST" style="flex:1; display:flex;">
+                        <input type="hidden" name="result" value="loss"/>
+                        <button type="submit" class="btn-report loss-btn w-100">✗ LOSS</button>
+                      </form>
+                    </div>
+                  <% } else if (isMyMatch && match.status === 'pending' && myResult) { %>
+                    <div class="match-actions">
+                      <span style="font-family:'Share Tech Mono',monospace; font-size:0.58rem; color:#475569; letter-spacing:0.1em; padding:4px 0;">
+                        REPORTED · WAITING FOR OPPONENT
+                      </span>
+                    </div>
+                  <% } %>
+
+                </div>
+              <% }) %>
+            </div>
+          </div>
+
+          <!-- Connector between rounds -->
+          <% if (roundIdx < orderedRounds.length - 1) { %>
+            <div class="round-connector">
+              <% for (let i = 0; i < Math.ceil(round.matches.length / 2); i++) { %>
+                <div class="connector-group"></div>
+              <% } %>
+            </div>
+          <% } %>
+
+        <% }) %>
+
+      </div>
+    </div>
+
+  </div>
+
+  <%- include('../partials/scripts') %>
+  <script>
+    const scroll = document.getElementById('bracketScroll');
+    let isDown = false, startX, scrollLeft;
+    scroll.addEventListener('mousedown', e => { isDown = true; startX = e.pageX - scroll.offsetLeft; scrollLeft = scroll.scrollLeft; });
+    scroll.addEventListener('mouseleave', () => { isDown = false; });
+    scroll.addEventListener('mouseup', () => { isDown = false; });
+    scroll.addEventListener('mousemove', e => {
+      if (!isDown) return;
+      e.preventDefault();
+      scroll.scrollLeft = scrollLeft - (e.pageX - scroll.offsetLeft - startX) * 1.5;
+    });
+  </script>
+</body>
+</html>

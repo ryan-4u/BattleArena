@@ -11,13 +11,13 @@ const flash = require("connect-flash");
 const passport = require("passport");
 const { autoUpdateTournamentStatus } = require("./middleware");
 
-
 const authRoutes = require("./routes/auth");
 const tournamentRoutes = require("./routes/tournament");
 const applicationRoutes = require("./routes/application");
 const profileRoutes = require("./routes/profile");
 const adminRoutes = require("./routes/admin");
 const orgApplicationRoutes = require("./routes/organiser-application");
+const bracketRoutes = require("./routes/bracket"); // ← NEW
 
 const app = express();
 
@@ -39,8 +39,6 @@ app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
 
 // Session
-
-
 const store = MongoStore.create({
   mongoUrl: dbUrl,
   crypto: {
@@ -79,7 +77,7 @@ passport.deserializeUser(User.deserializeUser());
 // Flash
 app.use(flash());
 
-// Global locals — available in every EJS template
+// Global locals
 app.use((req, res, next) => {
   res.locals.currUser = req.user || null;
   res.locals.success = req.flash("success");
@@ -88,11 +86,13 @@ app.use((req, res, next) => {
 });
 
 app.use(autoUpdateTournamentStatus);
+
 // Routes
 app.use("/", authRoutes);
 app.use("/admin", adminRoutes);
 app.use("/tournaments", tournamentRoutes);
 app.use("/tournaments", applicationRoutes);
+app.use("/tournaments", bracketRoutes); // ← NEW
 app.use("/profile", profileRoutes);
 app.use("/become-organiser", orgApplicationRoutes);
 
